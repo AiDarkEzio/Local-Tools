@@ -6,24 +6,31 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
+## Project Status
+
+- Type: MVP/Prototype
+- Stage: [Phase 1](./docs/DISCOVERY_PHASE.md#phase-1-core-foundation--framework-setup)
+- Tools count: 0
+
 ## Getting Started
 
-- Clone the repo
+- Clone the repository
 
-``` bash
+```bash
 git clone https://github.com/AiDarkEzio/Local-Tools.git
 ```
 
-- Install packages
+- Install dependencies
 
-``` bash
-cd Local-Tools; npm i
+```bash
+cd Local-Tools
+npm install
 ```
 
-- Spinup dev ui
+- Start the development server
 
-``` bash
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the Local Tools.
+Open [http://localhost:3000/Local-Tools](http://localhost:3000/Local-Tools) in your browser to view Local Tools.
