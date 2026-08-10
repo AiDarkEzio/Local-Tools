@@ -1,3 +1,5 @@
+<!-- docs\DESIGN_SYSTEM_SPEC.md -->
+
 # 🎨 Design System Spec: Modern Developer Utility Suite
 
 ## 1. Core Visual Identity
@@ -47,12 +49,12 @@ We will use the **Tailwind `zinc` palette** paired with an **`emerald` active ac
 
 ### A. Navigation Bar (Global)
 
-* **Sticky Top:** `sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800`
-* **Left Side:** Logo (Minimal icon -> `@/public/logo.svg` + Mono font title) + Category Links (`@/config/tools.ts` -> `ToolCategory`).
+* **Sticky Top:** `sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/80`
+* **Left Side:** Logo (Terminal icon + Mono font title `Local.Tools`) + Responsive Categories Navigation Dropdown (`DropdownMenu` with adaptive label `hidden sm:inline`).
 * **Center / Right Side:**
-  * **Command Palette Button:** A fake search bar that triggers `Cmd + K` on click (e.g., `Search tools...` with a `⌘K` badge).
-  * **GitHub Repo Link Button:** Displays star count badge.
-  * **Theme Toggle Switch:** Smooth icon transition (Sun/Moon).
+  * **Command Palette Button:** Collapses into a square icon button (`w-8`) on mobile (<640px) and expands into a full search trigger input (`sm:w-48 md:w-56`) with a `⌘K` badge on desktop.
+  * **GitHub Repo Link Button:** Displays GitHub icon (`size="icon-sm"`).
+  * **Theme Toggle Switch:** Smooth icon transition (Sun/Moon) with `useSyncExternalStore` SSR hydration protection.
 
 ### B. Homepage Layout (Bento Grid System)
 
@@ -60,11 +62,13 @@ We will use the **Tailwind `zinc` palette** paired with an **`emerald` active ac
    * Headline: Crisp, high-contrast headline (e.g., *"Fast, private utilities. 100% Client-Side."*).
    * Search Bar: Prominent input field with category filter pills underneath (`All`, `Favorites`, `Recently Used`, ...[`@/config/tools.ts` -> `ToolCategory`]).
 
-2. **Dynamic Bento Grid Occupancy:**
+2. **Dynamic Bento Grid Occupancy & Dense Packing:**
    * Bento Grid slots are calculated **dynamically** from each tool's metadata properties (`featured`, `gridSpan`, and `order`) in `@/config/tools.ts`.
-   * **`gridSpan: '2x2'`**: Occupies 2 columns × 2 rows with live visual micro-previews.
-   * **`gridSpan: '2x1'`**: Occupies 2 columns × 1 row for medium prominence.
-   * **`gridSpan: '1x1'`**: Standard single card occupancy (default).
+   * Container uses **CSS Dense Packing** (`grid-flow-dense` / `grid-auto-flow: dense`) on `grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[minmax(180px,auto)]` to automatically backfill empty grid gaps when large spans wrap.
+   * **`gridSpan: '2x2'`**: Occupies 2 columns × 2 rows (`sm:col-span-2 sm:row-span-2`).
+   * **`gridSpan: '2x1'`**: Occupies 2 columns × 1 row (`sm:col-span-2 sm:row-span-1`).
+   * **`gridSpan: '1x2'`**: Occupies 1 column × 2 rows (`sm:col-span-1 sm:row-span-2`).
+   * **`gridSpan: '1x1'`**: Standard single card occupancy (`col-span-1 row-span-1`).
 
 3. **Tool Card Design:**
    * Outer container: `p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-700`
@@ -88,6 +92,13 @@ Every tool page must adopt one of three standardized responsive layout archetype
 
 * **Deep Dive & Code Specification:** `@/docs/TOOL_LAYOUT_ARCHETYPES.md`
 
+### D. Footer Component (Global)
+
+* **Outer Container:** `w-full border-t border-border/60 bg-muted/20 py-6 text-xs text-muted-foreground`
+* **Layout Structure:** `flex flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6`
+* **Left Branding Block:** Flex-wrapping container (`flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-center sm:text-left`) keeping icon and title grouped while allowing the tagline to wrap gracefully on mobile viewports (<640px).
+* **Right Meta Links:** Monospace text links (`Zero Server Requests • MIT License`) centered on mobile screens and right-aligned on desktop.
+
 ---
 
 ## 5. Micro-Interactions & UX Polish
@@ -102,20 +113,3 @@ Every tool page must adopt one of three standardized responsive layout archetype
    * Dotted border active state: `border-2 border-dashed border-zinc-700 hover:border-emerald-500/50 bg-zinc-900/20 hover:bg-emerald-500/5`.
 4. **Loading & Processing States:**
    * When processing heavy WebAssembly tasks (like video or image compression), show a sleek progress bar and a pulsing state indicator instead of freezing the UI.
-
----
-
-### Summary Checklist for Implementation
-
-When setting up your repository, install these core UI packages:
-
-``` bash
-# Shadcn UI base components
-npx shadcn@latest init --src-dir
-
-# Add required UI components
-npx shadcn@latest add button card input badge dialog command dropdown-menu tabs
-
-# Toast notifications
-npm install sonner lucide-react
-```

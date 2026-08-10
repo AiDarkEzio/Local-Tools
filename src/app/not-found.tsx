@@ -33,7 +33,8 @@ export default function NotFound() {
           </Link>
           <a
             className="flex h-12 items-center justify-center rounded-full border border-solid border-black/[.08] px-6 text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-white dark:hover:bg-[#1a1a1a]"
-            href="https://github.com/AiDarkEzio/Local-Tools/issues/new"
+            // href="https://github.com/AiDarkEzio/Local-Tools/issues/new"
+            href="https://github.com/AiDarkEzio/Local-Tools/discussions/new?category=ideas"
             target="_blank"
             rel="noopener noreferrer"
           >

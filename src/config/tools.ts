@@ -24,7 +24,7 @@ export interface Tool {
   description: string; // Short SEO summary
   category: ToolCategory;
   path: string;        // Route path (e.g., '/tools/json-formatter')
-  icon: string;        // Lucide icon key
+  icon: string;        // Lucide icon key (e.g., Image / FileText)
   tags: ToolTag[];     // Strictly typed tags from KNOWN_TAGS
 
   // Visual & Feature Indicators

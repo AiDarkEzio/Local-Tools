@@ -1,3 +1,5 @@
+<!-- docs\TOOL_LAYOUT_ARCHETYPES.md -->
+
 # Deep Dive: The 3 Tool Layout Archetypes
 
 ``` text

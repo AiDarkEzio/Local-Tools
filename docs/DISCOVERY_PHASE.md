@@ -1,11 +1,13 @@
+<!-- docs\DISCOVERY_PHASE.md -->
+
 # 📄 Discovery Phase Document: `Local-Tools`
 
 **Project Name:** Local-Tools  
 **Project Type:** Open-Source Client-Side Utility Web Application  
 **Target Platform:** Web (Desktop & Mobile, Progressive Web App)  
 **Author:** @AiDarkEzio
-**Status:** Discovery & Architecture Planning Phase  
-**License:** MIT  
+**Status:** MVP Active Implementation Phase  
+**License:** MIT
 
 ---
 
@@ -82,23 +84,33 @@ To keep the application maintainable as new tools are added, `Local-Tools` uses 
 Local-Tools/
 ├── .github/                  # CI/CD workflows (GitHub Actions)
 ├── docs/                     # Architecture & Discovery docs
-│   └── DISCOVERY_PHASE.md
+│   ├── BASECN.md
+│   ├── DESIGN_SYSTEM_SPEC.md
+│   ├── DISCOVERY_PHASE.md
+│   ├── PROJECT_UI_SYSTEM.md
+│   └── TOOL_LAYOUT_ARCHETYPES.md
 ├── src/
 │   ├── app/                  # Next.js App Router (SSG Pages)
-│   │   ├── layout.tsx        # Global Layout (Navbar, Sidebar, Command Palette)
-│   │   ├── page.tsx          # Homepage Dashboard with Tool Search
-│   │   └── tools/            # Individual Tool Page Routes
+│   │   ├── (app)/
+│   │   │   ├── layout.tsx    # App Shell (Navbar, Footer)
+│   │   │   └── page.tsx      # Bento Grid Dashboard & Search
+│   │   ├── layout.tsx        # Root Providers & Fonts
+│   │   └── not-found.tsx     # 404 Error Stage
 │   ├── components/
-│   │   ├── layouts/          # Shared Navigation, Search Header, Tool Layout Wrappers, Footer
-│   │   ├── ui/               # Shadcn components (Button, Card, Input)
-│   │   └── tools/            # Concrete tool UI implementations
+│   │   ├── home/             # Homepage components (tool-card.tsx)
+│   │   ├── icons/            # Brand & Tool SVG components (tool-icon.tsx, github-icon.tsx)
+│   │   ├── navigation/       # Navigation components (navbar.tsx, command-menu.tsx)
+│   │   └── ui/               # Base UI / Shadcn primitives (button, card, input-group, etc.)
 │   ├── config/
-│   │   ├── tools.ts          # Metadata registry for all tools
-│   │   └── tags.ts
-│   ├── lib/                  # Shared helper functions
-│   └── workers/              # Dedicated Web Workers for heavy tasks
+│   │   ├── tags.ts           # Strictly-typed ToolTag array
+│   │   └── tools.ts          # Metadata registry for all tools
+│   ├── hooks/                # LocalStorage & Client state hooks
+│   │   ├── use-favorites.ts  # Persisted favorites toggle state
+│   │   └── use-recent-tools.ts# Persisted recent usage timestamp log
+│   ├── lib/                  # Shared helper functions (utils.ts)
+│   └── types/                # Storage & Data contracts (storage.ts)
 ├── public/                   # Static assets & PWA manifest
-├── next.config.mjs           # Configured for static export (and basePath if deploying to GitHub Pages)
+├── next.config.ts            # Configured for static export (output: 'export')
 └── tsconfig.json
 ```
 
