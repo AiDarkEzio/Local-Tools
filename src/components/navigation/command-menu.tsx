@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Search, Terminal, Sparkles, ArrowRight } from "lucide-react";
+import { Terminal, Sparkles, ArrowRight } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -13,7 +13,8 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
-import { TOOLS, ToolCategory } from "@/config/tools";
+import { TOOLS, ToolCategory, Tool } from "@/config/tools";
+import { useRecentTools } from "@/hooks/use-recent-tools";
 
 interface CommandMenuProps {
   open: boolean;
@@ -36,6 +37,7 @@ const CATEGORY_LABELS: Record<ToolCategory, string> = {
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const router = useRouter();
+  const { addRecentTool } = useRecentTools();
 
   // Handle global Cmd + K shortcut
   React.useEffect(() => {
@@ -50,9 +52,10 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     return () => document.removeEventListener("keydown", down);
   }, [open, onOpenChange]);
 
-  const handleSelect = (path: string) => {
+  const handleSelect = (tool: Tool) => {
+    addRecentTool(tool.id);
     onOpenChange(false);
-    router.push(path);
+    router.push(tool.path);
   };
 
   const featuredTools = TOOLS.filter((t) => t.featured);
@@ -72,7 +75,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandItem
               key={tool.id}
               value={`${tool.name} ${tool.tags.join(" ")} ${tool.category}`}
-              onSelect={() => handleSelect(tool.path)}
+              onSelect={() => handleSelect(tool)}
               className="flex items-center justify-between py-2 cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
@@ -98,7 +101,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
                 <CommandItem
                   key={tool.id}
                   value={`${tool.name} ${tool.tags.join(" ")} ${tool.category}`}
-                  onSelect={() => handleSelect(tool.path)}
+                  onSelect={() => handleSelect(tool)}
                   className="flex items-center justify-between py-2 cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5">
