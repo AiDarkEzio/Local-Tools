@@ -46,5 +46,6 @@
   "src/components/home/tool-card.tsx": true,
   "src/components/icons/tool-icon.tsx": true,
   "src/hooks/use-favorites.ts": true,
-  "src/hooks/use-recent-tools.ts": true
+  "src/hooks/use-recent-tools.ts": true,
+  "docs/UI_BEST_PRACTICES.md": false
 }

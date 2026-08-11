@@ -1,3 +1,5 @@
+<!-- docs\UI_BEST_PRACTICES.md -->
+
 # 🚨 Critical Architectural Rules & Best Practices
 
 Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI, follow these rules to avoid TypeScript and runtime errors.
