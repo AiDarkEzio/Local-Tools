@@ -112,55 +112,33 @@ The project uses **Tailwind CSS v4** with **OKLCH color space** variables for hi
 
 ---
 
-## 3. 🧩 Component Catalog (`src/components/ui/*` & Custom Hooks)
+## 3. 🧩 Component & Data Catalog (`src/components/ui/*`, `src/config/*`, `src/hooks/*`)
 
-### 1. `Button` (`@/components/ui/button`)
+### UI Components
 
-- **Engine**: `@base-ui/react/button`
-- **Variants**: `default`, `outline`, `secondary`, `ghost`, `destructive`, `link`
-- **Sizes**: `default`, `xs`, `sm`, `lg`, `icon`, `icon-xs`, `icon-sm`, `icon-lg`
+1. **`Button`** (`@/components/ui/button`): Base UI button engine supporting `default`, `outline`, `secondary`, `ghost`, `destructive`, `link` variants and custom sizes (`xs`, `sm`, `icon-xs`, `icon-sm`, etc.).
+2. **`Badge`** (`@/components/ui/badge`): Inline badge supporting `default`, `secondary`, `destructive`, `outline` variants.
+3. **`Card`** (`@/components/ui/card`): Structural card container with `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, and `CardFooter`.
+4. **`Tabs`** (`@/components/ui/tabs`): Tab panel navigation system built on Base UI tabs.
+5. **`Textarea`** (`@/components/ui/textarea`): Multi-line form input with auto-height and dark mode styling.
+6. **`InputGroup`** (`@/components/ui/input-group`): Flexible input container supporting addons, inline icons, and trigger buttons.
+7. **`DropdownMenu`** (`@/components/ui/dropdown-menu`): Menu popover built on `@base-ui/react/menu`.
+8. **`Command` & `CommandDialog`** (`@/components/ui/command`): Modal search menu powered by `cmdk`.
+9. **`Sonner` Toaster** (`@/components/ui/sonner`): Toast notification system integrated with `next-themes`.
 
-### 2. `Badge` (`@/components/ui/badge`)
+### Configuration & Data Layer (`src/config/*`)
 
-- **Variants**: `default`, `secondary`, `destructive`, `outline`
+1. **`categories.ts`**: Single source of truth for tool categories, display labels, indicator dots, pill borders, and pastel badge styling (`CATEGORIES_MAP`, `ALL_FILTER_KEYS`, `getCategoryConfig`).
+2. **`tools.ts`**: Master tool registry array (`TOOLS`) containing tool metadata, categories, paths, grid span allocations, and tags.
+3. **`tags.ts`**: Strongly typed constant array (`KNOWN_TAGS`) restricting allowable tool tags.
 
-### 3. `Card` (`@/components/ui/card`)
+### Custom Application Hooks (`src/hooks/*`)
 
-- **Sub-components**: `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`
-
-### 4. `Tabs` (`@/components/ui/tabs`)
-
-- **Engine**: `@base-ui/react/tabs`
-- **Sub-components**: `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
-
-### 5. `Textarea` (`@/components/ui/textarea`)
-
-- Form styled responsive multi-line input box.
-
-### 6. `InputGroup` (`@/components/ui/input-group`)
-
-- **Sub-components**: `InputGroup`, `InputGroupAddon`, `InputGroupInput`, `InputGroupButton`, `InputGroupText`, `InputGroupTextarea`
-
-### 7. `DropdownMenu` (`@/components/ui/dropdown-menu`)
-
-- **Engine**: `@base-ui/react/menu`
-- **Sub-components**: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuItem`, `DropdownMenuSeparator`
-
-### 8. `Command` & `CommandDialog` (`@/components/ui/command`)
-
-- **Engine**: `cmdk` + Custom Dialog wrapper
-
-### 9. `Sonner` Toaster (`@/components/ui/sonner`)
-
-- Toast container powered by `sonner` and `next-themes` integration.
-
-### 10. Custom Application Hooks (`src/hooks/*`)
-
-- **`useFavorites`**: Manages favorite tool IDs with `localStorage` persistence (`local-tools:favorites`) and `sonner` toast alerts.
-- **`useRecentTools`**: Logs recently selected tool timestamps in `localStorage` (`local-tools:recent`).
+1. **`useFavorites`**: Manages favorite tool IDs with `localStorage` persistence (`local-tools:favorites`) and `sonner` toast alerts.
+2. **`useRecentTools`**: Logs recently selected tool timestamps in `localStorage` (`local-tools:recent`).
 
 ---
 
 ## 4. 🚨 Critical Architectural Rules & Best Practices
 
-- For a comprehensive guide on component composition rules (avoiding Radix patterns like `asChild`), Base UI integration requirements, hydration guarding, state synchronization without `useEffect` cascades, and layout constraints, please refer to the dedicated [UI Best Practices Reference](./UI_BEST_PRACTICES.md).
+- Refer to [UI Best Practices Reference](./UI_BEST_PRACTICES.md) for detailed guidelines on Base UI composition, avoiding `asChild`, React 19 immutability rules, and state synchronization with `useSyncExternalStore`.

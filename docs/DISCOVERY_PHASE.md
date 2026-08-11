@@ -57,6 +57,9 @@
        │
        ├──► Next.js Static Bundle (HTML / CSS / TSX)
        │
+       ├──► Central Category Registry (config/categories.ts)
+       │       └── Pastel Color Tokens, Dot Indicators & Filter Maps
+       │
        ├──► Central Tool Registry (config/tools.ts)
        │
        ├──► Local Tool Components (Client Execution Only)
@@ -66,7 +69,7 @@
        └──► LocalStorage & URL State Sync (Zero Server Persistence)
                ├── Favorites Array (`local-tools:favorites`)
                ├── Recent Tools Timestamp Log (`local-tools:recent`)
-               └── URL Hash Sync (`useSyncExternalStore`)
+               └── URL Hash Sync (`useSyncExternalStore` + `pushState`)
 ```
 
 ---
@@ -85,7 +88,8 @@ Local-Tools/
 │   ├── DESIGN_SYSTEM_SPEC.md
 │   ├── DISCOVERY_PHASE.md
 │   ├── PROJECT_UI_SYSTEM.md
-│   └── TOOL_LAYOUT_ARCHETYPES.md
+│   ├── TOOL_LAYOUT_ARCHETYPES.md
+│   └── UI_BEST_PRACTICES.md
 ├── src/
 │   ├── app/                  # Next.js App Router (SSG Pages)
 │   │   ├── (app)/
@@ -101,6 +105,7 @@ Local-Tools/
 │   │   ├── theme-provider.tsx# Next-themes dark/light mode wrapper
 │   │   └── ui/               # Base UI / Shadcn primitives (badge, button, card, command, dialog, dropdown-menu, input, input-group, sonner, tabs, textarea)
 │   ├── config/
+│   │   ├── categories.ts     # Centralized category config, labels & pastel theme tokens
 │   │   ├── tags.ts           # Strictly-typed ToolTag array
 │   │   └── tools.ts          # Metadata registry for all tools
 │   ├── hooks/                # LocalStorage & Client state hooks
@@ -113,9 +118,43 @@ Local-Tools/
 └── tsconfig.json
 ```
 
-### 4.2 Central Tool Registry Contract (`src/config/tools.ts`)
+### 4.2 Central Category & Tool Registries Contract
 
-Every tool added to `Local-Tools` must fulfill the strongly-typed contract including grid occupancy metadata for dynamic layout rendering:
+All category metadata, display labels, visual dots, and pastel theme tokens are centralized in `@/config/categories.ts`:
+
+```typescript
+export type ToolCategory =
+  | 'dev'
+  | 'text'
+  | 'image'
+  | 'video-audio'
+  | 'document'
+  | 'security'
+  | 'math-finance'
+  | 'time'
+  | 'generators'
+  | 'unit-converter'
+  | 'games-edu';
+
+export type CategoryFilterKey = 'all' | 'favorites' | 'recent' | ToolCategory;
+
+export interface CategoryConfig {
+  id: CategoryFilterKey;
+  label: string;
+  dotColor: string;       // Indicator dot class (e.g. "bg-emerald-400")
+  pillBorder: string;     // Pastel border color for landing page filter pills
+  pillActiveBg: string;   // Active background state when pill is selected
+  badgeBg: string;        // Soft pastel background for Tool Card category badges
+  badgeText: string;      // Contrasting text color for Tool Card category badges
+  badgeBorder: string;    // Soft border for Tool Card category badges
+}
+
+export const CATEGORIES_MAP: Record<CategoryFilterKey, CategoryConfig>;
+export const ALL_FILTER_KEYS: CategoryFilterKey[];
+export function getCategoryConfig(key: string): CategoryConfig;
+```
+
+Every tool added to `Local-Tools` must fulfill the strongly-typed contract defined in `@/config/tools.ts`:
 
 ```typescript
 export type GridSpan = '1x1' | '2x1' | '1x2' | '2x2';
@@ -146,7 +185,8 @@ The application will be developed iteratively in phases:
 ### Phase 1: Core Foundation & Framework Setup
 
 * Set up Next.js (App Router), TypeScript, Tailwind CSS v4, and Base UI / Shadcn UI primitives.
-* Build the global layout, search bar (Command-K modal), theme toggle, and URL-hash tab state synchronization.
+* Build global shell, navigation bar, search bar (Command-K modal), theme toggle, and URL-hash tab state synchronization.
+* Implement centralized category system (`categories.ts`) with pastel color identity.
 * Configure static site export (`output: 'export'`) and GitHub Actions Pages workflow.
 
 ### Phase 2: Lightweight Text & Developer Utilities (Fast Wins)
