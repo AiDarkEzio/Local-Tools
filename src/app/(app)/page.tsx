@@ -1,9 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Search, X, Star, Clock, Terminal, BadgeCheck } from "lucide-react";
+import { Search, X, Star, Clock, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
-import { TOOLS, ToolCategory } from "@/config/tools";
+import { TOOLS } from "@/config/tools";
+import {
+  CategoryFilterKey,
+  ALL_FILTER_KEYS,
+  CATEGORIES_MAP,
+  getCategoryConfig,
+} from "@/config/categories";
 import { ToolCard } from "@/components/home/tool-card";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useRecentTools } from "@/hooks/use-recent-tools";
@@ -11,29 +17,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-
-const CATEGORY_LABELS: Record<ToolCategory, string> = {
-  dev: "Developer",
-  text: "Text & Code",
-  image: "Image & Media",
-  "video-audio": "Video & Audio",
-  document: "Document & PDF",
-  security: "Security & Crypto",
-  "math-finance": "Math & Finance",
-  time: "Time & Date",
-  generators: "Generators",
-  "unit-converter": "Unit Converters",
-  "games-edu": "Games & Edu",
-};
-
-type FilterTab = "all" | "favorites" | "recent" | ToolCategory;
-
-const VALID_TABS: FilterTab[] = [
-  "all",
-  "favorites",
-  "recent",
-  ...(Object.keys(CATEGORY_LABELS) as ToolCategory[]),
-];
 
 // External Store Subscription for browser URL hash
 function subscribeHash(callback: () => void) {
@@ -69,17 +52,17 @@ export default function Home() {
   const rawHash = rawHashWithSymbol.replace("#", "").trim();
 
   // Derive activeTab synchronously during render
-  const activeTab = React.useMemo<FilterTab>(() => {
+  const activeTab = React.useMemo<CategoryFilterKey>(() => {
     if (!rawHash || rawHash === "all") return "all";
-    if (VALID_TABS.includes(rawHash as FilterTab)) {
-      return rawHash as FilterTab;
+    if (ALL_FILTER_KEYS.includes(rawHash as CategoryFilterKey)) {
+      return rawHash as CategoryFilterKey;
     }
     return "all"; // Fallback to "all" for invalid hashes
   }, [rawHash]);
 
   // Toast notification & URL cleanup for invalid hash
   React.useEffect(() => {
-    if (rawHash && rawHash !== "all" && !VALID_TABS.includes(rawHash as FilterTab)) {
+    if (rawHash && rawHash !== "all" && !ALL_FILTER_KEYS.includes(rawHash as CategoryFilterKey)) {
       toast.error("Category Not Found", {
         description: `"${rawHash}" is not a recognized category. Displaying all tools instead.`,
         id: "invalid-category-toast",
@@ -90,14 +73,11 @@ export default function Home() {
     }
   }, [rawHash]);
 
-  // Tab click handler updates URL anchor (which automatically triggers store update)
-  const handleTabChange = (tab: FilterTab) => {
-    if (tab === "all") {
-      window.history.pushState(null, "", window.location.pathname);
-      window.dispatchEvent(new Event("hashchange"));
-    } else {
-      window.location.hash = tab;
-    }
+  // Tab click handler updates URL anchor cleanly without window object mutations
+  const handleTabChange = (tab: CategoryFilterKey) => {
+    const newUrl = tab === "all" ? window.location.pathname : `${window.location.pathname}#${tab}`;
+    window.history.pushState(null, "", newUrl);
+    window.dispatchEvent(new Event("hashchange"));
   };
 
   // Filter tools based on active tab and search query
@@ -142,6 +122,8 @@ export default function Home() {
     handleTabChange("all");
   };
 
+  const activeCategoryConfig = getCategoryConfig(activeTab);
+
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
       {/* Hero Section */}
@@ -170,7 +152,7 @@ export default function Home() {
 
         {/* Search Input Box */}
         <div className="w-full max-w-xl mt-8">
-          <InputGroup className="h-11 rounded-xl border-border/80 bg-card/80 shadow-xs has-[input:focus-visible]:border-emerald-500 focus-within:ring-emerald-500/20">
+          <InputGroup className="h-11 rounded-xl border-border/80 bg-card/80 shadow-xs focus-within:border-emerald-500 focus-within:ring-emerald-500/20">
             <InputGroupAddon align="inline-start" className="pl-3.5 text-muted-foreground">
               <Search className="w-4 h-4" />
             </InputGroupAddon>
@@ -196,64 +178,41 @@ export default function Home() {
         </div>
 
         {/* Filter Pills Navigation */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 mt-6 w-full max-w-4xl">
-          <Button
-            variant={activeTab === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleTabChange("all")}
-            className={cn(
-              "h-8 text-xs rounded-full px-3 transition-all",
-              activeTab === "all" ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium" : "text-muted-foreground"
-            )}
-          >
-            All Tools ({TOOLS.length})
-          </Button>
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-6 w-full max-w-5xl">
+          {ALL_FILTER_KEYS.map((key) => {
+            const cat = CATEGORIES_MAP[key];
+            const isActive = activeTab === key;
 
-          <Button
-            variant={activeTab === "favorites" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleTabChange("favorites")}
-            className={cn(
-              "h-8 text-xs rounded-full px-3 gap-1.5 transition-all",
-              activeTab === "favorites" ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium" : "text-muted-foreground"
-            )}
-          >
-            <Star className={cn("w-3.5 h-3.5", activeTab === "favorites" ? "fill-zinc-950" : "text-amber-400")} />
-            Favorites ({favorites.length})
-          </Button>
+            // Calculate tool count for pill display
+            let count = TOOLS.length;
+            if (key === "favorites") count = favorites.length;
+            else if (key === "recent") count = recentIds.length;
+            else if (key !== "all") count = TOOLS.filter((t) => t.category === key).length;
 
-          <Button
-            variant={activeTab === "recent" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleTabChange("recent")}
-            className={cn(
-              "h-8 text-xs rounded-full px-3 gap-1.5 transition-all",
-              activeTab === "recent" ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium" : "text-muted-foreground"
-            )}
-          >
-            <Clock className="w-3.5 h-3.5" />
-            Recent ({recentIds.length})
-          </Button>
-
-          <div className="w-full h-0 sm:hidden" />
-
-          {(Object.keys(CATEGORY_LABELS) as ToolCategory[]).map((cat) => {
-            const count = TOOLS.filter((t) => t.category === cat).length;
-            const isActive = activeTab === cat;
             return (
               <Button
-                key={cat}
-                variant={isActive ? "default" : "ghost"}
+                key={key}
+                variant={isActive ? "default" : "outline"}
                 size="sm"
-                onClick={() => handleTabChange(cat)}
+                onClick={() => handleTabChange(key)}
                 className={cn(
-                  "h-8 text-xs rounded-full px-3 transition-all",
+                  "h-8 text-xs rounded-full px-3 gap-1.5 transition-all border",
                   isActive
-                    ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? cat.pillActiveBg
+                    : cn("bg-background/60 text-muted-foreground hover:text-foreground", cat.pillBorder)
                 )}
               >
-                {CATEGORY_LABELS[cat]} ({count})
+                {/* Designated Pastel Color Dot */}
+                {key === "favorites" ? (
+                  <Star className={cn("w-3.5 h-3.5", isActive ? "fill-zinc-950" : "text-amber-400")} />
+                ) : key === "recent" ? (
+                  <Clock className="w-3.5 h-3.5 text-sky-400" />
+                ) : (
+                  <span className={cn("h-2 w-2 rounded-full shrink-0", cat.dotColor)} />
+                )}
+
+                <span>{cat.label}</span>
+                <span className="text-[10px] opacity-70 font-mono">({count})</span>
               </Button>
             );
           })}
@@ -263,9 +222,15 @@ export default function Home() {
       {/* Tools Counter / Active Filter Bar */}
       <div className="flex items-center justify-between mb-6 pb-2 border-b border-border/60">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-emerald-500" />
+          <span className={cn("h-2.5 w-2.5 rounded-full", activeCategoryConfig.dotColor)} />
           <h2 className="text-sm font-semibold font-mono tracking-tight text-foreground uppercase">
-            {activeTab === "all" ? "Available Tools" : activeTab === "favorites" ? "Favorited Utilities" : activeTab === "recent" ? "Recently Used Utilities" : `${CATEGORY_LABELS[activeTab as ToolCategory]} Utilities`}
+            {activeTab === "all"
+              ? "Available Tools"
+              : activeTab === "favorites"
+              ? "Favorited Utilities"
+              : activeTab === "recent"
+              ? "Recently Used Utilities"
+              : `${activeCategoryConfig.label} Utilities`}
           </h2>
           <Badge variant="secondary" className="font-mono text-[11px] px-2 py-0">
             {filteredTools.length}

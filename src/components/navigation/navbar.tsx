@@ -1,3 +1,5 @@
+// src/components/navigation/navbar.tsx
+
 "use client";
 
 import * as React from "react";
@@ -17,31 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { GithubIcon } from "@/components/icons/github-icon";
 import { CommandMenu } from "@/components/navigation/command-menu";
-import { ToolCategory } from "@/config/tools";
+import { ALL_FILTER_KEYS, CATEGORIES_MAP } from "@/config/categories";
 import { cn } from "@/lib/utils";
-
-// Base Category List (prepared for future centralization)
-const BASE_CATEGORIES: { id: string; label: string }[] = [
-  { id: "dev", label: "Developer Tools" },
-  { id: "text", label: "Text & Formatting" },
-  { id: "image", label: "Image Utilities" },
-  { id: "document", label: "Document & PDF" },
-  { id: "security", label: "Security & Crypto" },
-  { id: "generators", label: "Generators & Codes" },
-  { id: "time", label: "Time & Clock" },
-  { id: "math-finance", label: "Math & Calculators" },
-  { id: "unit-converter", label: "Unit Converters" },
-  { id: "video-audio", label: "Video & Audio" },
-];
-
-// Injected anchor links for Quick Filters
-const INJECTED_ANCHORS: { id: string; label: string }[] = [
-  { id: "favorites", label: "Favorited Utilities" },
-  { id: "recent", label: "Recently Used" },
-];
-
-// Dynamically composite without mutating BASE_CATEGORIES directly
-const CATEGORIES = [...INJECTED_ANCHORS, ...BASE_CATEGORIES];
 
 const emptySubscribe = () => () => {};
 
@@ -91,26 +70,31 @@ export function Navbar() {
                   <span className="hidden sm:inline">Categories</span>
                   <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 p-1.5">
+                <DropdownMenuContent align="start" className="w-56 p-1.5 max-h-[380px] overflow-y-auto">
                   <DropdownMenuGroup>
                     <DropdownMenuLabel className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">
                       Tool Categories
                     </DropdownMenuLabel>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  {CATEGORIES.map((cat) => (
-                    <DropdownMenuItem
-                      key={cat.id}
-                      render={
-                        <Link
-                          href={`/#${cat.id}`}
-                          className="flex items-center justify-between text-xs py-1.5 px-2 cursor-pointer rounded-md"
-                        />
-                      }
-                    >
-                      <span>{cat.label}</span>
-                    </DropdownMenuItem>
-                  ))}
+                  {ALL_FILTER_KEYS.map((key) => {
+                    const cat = CATEGORIES_MAP[key];
+                    return (
+                      <DropdownMenuItem
+                        key={cat.id}
+                        render={
+                          <Link
+                            href={`/#${cat.id}`}
+                            className="flex items-center gap-2 text-xs py-1.5 px-2 cursor-pointer rounded-md"
+                          />
+                        }
+                      >
+                        {/* Designated Color Dot Indicator */}
+                        <span className={cn("h-2 w-2 rounded-full shrink-0", cat.dotColor)} />
+                        <span>{cat.label}</span>
+                      </DropdownMenuItem>
+                    );
+                  })}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
