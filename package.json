@@ -1,7 +1,7 @@
 {
   "name": "local-tools",
   "description": "A fast, privacy-first collection of web utilities running 100% locally in your browser. Built with Next.js, TypeScript & Tailwind CSS.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

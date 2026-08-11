@@ -10,8 +10,8 @@
 
 ## Project Status
 
-- Type: MVP/Prototype
-- Stage: [Phase 1](./docs/DISCOVERY_PHASE.md#phase-1-core-foundation--framework-setup)
+- Version: `v0.2.0`
+- Stage: [Phase 2 — Lightweight Utilities](./docs/DISCOVERY_PHASE.md#phase-2-lightweight-text--developer-utilities-fast-wins)
 - Tools count: 0
 
 ## Getting Started
