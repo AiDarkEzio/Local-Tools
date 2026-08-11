@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Search, Sun, Moon, Terminal, ChevronDown, Layers } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -36,7 +37,11 @@ const emptySubscribe = () => () => {};
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
   const [commandOpen, setCommandOpen] = React.useState(false);
+
+  // Check if current page is the root/home page
+  const isHomePage = pathname === "/";
 
   // Safely detect client hydration without useEffect render cascades
   const mounted = React.useSyncExternalStore(
@@ -60,43 +65,45 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Category Navigation Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2"
-                  />
-                }
-              >
-                <Layers className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <span className="hidden sm:inline">Categories</span>
-                <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56 p-1.5">
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">
-                    Tool Categories
-                  </DropdownMenuLabel>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                {CATEGORIES.map((cat) => (
-                  <DropdownMenuItem
-                    key={cat.id}
-                    render={
-                      <Link
-                        href={`/#${cat.id}`}
-                        className="flex items-center justify-between text-xs py-1.5 px-2 cursor-pointer rounded-md"
-                      />
-                    }
-                  >
-                    <span>{cat.label}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Category Navigation Dropdown — Hidden on Home Page */}
+            {!isHomePage && (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground h-8 px-2"
+                    />
+                  }
+                >
+                  <Layers className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <span className="hidden sm:inline">Categories</span>
+                  <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56 p-1.5">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">
+                      Tool Categories
+                    </DropdownMenuLabel>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  {CATEGORIES.map((cat) => (
+                    <DropdownMenuItem
+                      key={cat.id}
+                      render={
+                        <Link
+                          href={`/#${cat.id}`}
+                          className="flex items-center justify-between text-xs py-1.5 px-2 cursor-pointer rounded-md"
+                        />
+                      }
+                    >
+                      <span>{cat.label}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
 
           {/* Right Side: Command Trigger, Github Link & Theme Toggle */}
