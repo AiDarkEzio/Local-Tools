@@ -1,3 +1,5 @@
+// src/components/navigation/command-menu.tsx
+
 "use client";
 
 import * as React from "react";
@@ -13,27 +15,15 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
-import { TOOLS, ToolCategory, Tool } from "@/config/tools";
+import { TOOLS, Tool } from "@/config/tools";
+import { CATEGORIES_MAP, TOOL_CATEGORIES_KEYS, getCategoryConfig } from "@/config/categories";
 import { useRecentTools } from "@/hooks/use-recent-tools";
+import { cn } from "@/lib/utils";
 
 interface CommandMenuProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const CATEGORY_LABELS: Record<ToolCategory, string> = {
-  dev: "Developer Utilities",
-  text: "Text & Formatting",
-  image: "Image & Media",
-  "video-audio": "Video & Audio",
-  document: "Documents & PDF",
-  security: "Security & Encryption",
-  "math-finance": "Math & Finance",
-  time: "Time & Date",
-  generators: "Generators",
-  "unit-converter": "Unit Converters",
-  "games-edu": "Games & Education",
-};
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const router = useRouter();
@@ -59,7 +49,6 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   };
 
   const featuredTools = TOOLS.filter((t) => t.featured);
-  const categories = Array.from(new Set(TOOLS.map((t) => t.category)));
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
@@ -71,32 +60,47 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
         {/* Featured Section */}
         <CommandGroup heading="Featured & Popular">
-          {featuredTools.map((tool) => (
-            <CommandItem
-              key={tool.id}
-              value={`${tool.name} ${tool.tags.join(" ")} ${tool.category}`}
-              onSelect={() => handleSelect(tool)}
-              className="flex items-center justify-between py-2 cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="font-medium text-xs">{tool.name}</span>
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-border/60">
-                  {tool.category}
-                </Badge>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/50" />
-            </CommandItem>
-          ))}
+          {featuredTools.map((tool) => {
+            const cat = getCategoryConfig(tool.category);
+            return (
+              <CommandItem
+                key={tool.id}
+                value={`${tool.name} ${tool.tags.join(" ")} ${tool.category}`}
+                onSelect={() => handleSelect(tool)}
+                className="flex items-center justify-between py-2 cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="font-medium text-xs">{tool.name}</span>
+                  <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 border", cat.badgeBg, cat.badgeText, cat.badgeBorder)}>
+                    {cat.label}
+                  </Badge>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/50" />
+              </CommandItem>
+            );
+          })}
         </CommandGroup>
 
         <CommandSeparator />
 
         {/* All Categories */}
-        {categories.map((category) => {
-          const categoryTools = TOOLS.filter((t) => t.category === category);
+        {TOOL_CATEGORIES_KEYS.map((categoryKey) => {
+          const categoryTools = TOOLS.filter((t) => t.category === categoryKey);
+          const catConfig = CATEGORIES_MAP[categoryKey];
+
+          if (categoryTools.length === 0) return null;
+
           return (
-            <CommandGroup key={category} heading={CATEGORY_LABELS[category] || category}>
+            <CommandGroup
+              key={categoryKey}
+              heading={
+                <div className="flex items-center gap-2">
+                  <span className={cn("h-2 w-2 rounded-full", catConfig.dotColor)} />
+                  <span>{catConfig.label}</span>
+                </div>
+              }
+            >
               {categoryTools.map((tool) => (
                 <CommandItem
                   key={tool.id}

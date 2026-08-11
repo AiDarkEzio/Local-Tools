@@ -1,9 +1,12 @@
+// src/components/home/tool-card.tsx
+
 "use client";
 
 import * as React from "react";
 import Link from "next/link";
 import { Star, ArrowUpRight, Sparkles } from "lucide-react";
 import { Tool } from "@/config/tools";
+import { getCategoryConfig } from "@/config/categories";
 import { ToolIcon } from "@/components/icons/tool-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +27,8 @@ export function ToolCard({
   onSelectTool,
   isBentoActive = true,
 }: ToolCardProps) {
+  const catConfig = getCategoryConfig(tool.category);
+
   // Breakpoint-aware Bento Grid span classes
   const spanClasses = React.useMemo(() => {
     if (!isBentoActive || !tool.gridSpan) return "col-span-1 row-span-1";
@@ -116,8 +121,17 @@ export function ToolCard({
 
       {/* Footer Row: Category Badge & Tag Badges */}
       <div className="mt-4 pt-3 border-t border-border/40 flex flex-wrap items-center justify-between gap-2">
-        <Badge variant="secondary" className="text-[10px] px-2 py-0.5 capitalize bg-muted/60 text-muted-foreground font-mono">
-          {tool.category}
+        {/* Category Badge with Pastel Theme Tokens */}
+        <Badge
+          variant="outline"
+          className={cn(
+            "text-[10px] px-2 py-0.5 capitalize font-mono border",
+            catConfig.badgeBg,
+            catConfig.badgeText,
+            catConfig.badgeBorder
+          )}
+        >
+          {catConfig.label}
         </Badge>
 
         <div className="flex flex-wrap items-center gap-1">

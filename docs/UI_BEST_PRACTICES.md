@@ -2,7 +2,7 @@
 
 # 🚨 Critical Architectural Rules & Best Practices
 
-Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI, follow these rules to avoid TypeScript and runtime errors.
+Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI and target **React 19 / Next.js 16**, follow these rules to avoid TypeScript, React Compiler, and runtime errors.
 
 ## ⛔ Rule 1: Do NOT use `asChild` on Base UI Components
 
@@ -109,7 +109,7 @@ function CommandDialog({ children, ...props }: React.ComponentProps<typeof Dialo
 
 ---
 
-## 5. Hydration Guarding without `useEffect` Cascades
+## ⛔ Rule 5: Hydration Guarding without `useEffect` Cascades
 
 To prevent React 19 / Compiler errors (`setState synchronously within an effect`), use `useSyncExternalStore` for client-side mounting checks (e.g., theme toggles):
 
@@ -168,11 +168,11 @@ When creating asymmetrical grid layouts with varying column/row spans (`2x2`, `2
 
 ---
 
-## ⛔ Rule 8: Synchronize Browser Stores (`localStorage`, URL Hashes) via `useSyncExternalStore`
+## ⛔ Rule 8: Synchronize Browser Stores (`localStorage`, URL Hashes) via `useSyncExternalStore` & Avoid Mutating Global Objects
 
-Do **not** read `localStorage` or `window.location.hash` inside `useEffect` and immediately call `setState()`. This triggers React 19 / Compiler linter errors (`react-hooks/set-state-in-effect`) due to cascading re-renders.
+Do **not** read `localStorage` or `window.location.hash` inside `useEffect` and call `setState()`. Furthermore, do **not** directly mutate global browser objects like `window.location.hash = tab` inside event handlers, as this violates React 19 / React Compiler strict immutability rules (`react-hooks/immutability`).
 
-Instead, subscribe to external browser storage and location sources using React's built-in `useSyncExternalStore`.
+Instead, subscribe to external browser storage and location sources using `useSyncExternalStore`, and update browser URL state via `window.history.pushState`:
 
 ### Example 1: Synchronizing `localStorage`
 
@@ -184,7 +184,7 @@ function subscribe(callback: () => void) {
   window.addEventListener(STORAGE_EVENT, callback);
   return () => {
     window.removeEventListener("storage", callback);
-    window.removeEventListener("storage", callback);
+    window.removeEventListener(STORAGE_EVENT, callback);
   };
 }
 
@@ -229,6 +229,13 @@ function getHashServerSnapshot(): string {
   return "";
 }
 
-// Inside Component: derive state synchronously during render without setState in effect
+// Inside Component: derive state synchronously during render
 const rawHash = React.useSyncExternalStore(subscribeHash, getHashSnapshot, getHashServerSnapshot);
+
+// Event Handler: update URL state safely without mutating window.location directly
+const handleTabChange = (tab: CategoryFilterKey) => {
+  const newUrl = tab === "all" ? window.location.pathname : `${window.location.pathname}#${tab}`;
+  window.history.pushState(null, "", newUrl);
+  window.dispatchEvent(new Event("hashchange"));
+};
 ```
