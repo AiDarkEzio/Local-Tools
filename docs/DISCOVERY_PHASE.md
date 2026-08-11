@@ -45,14 +45,11 @@
 | **Framework** | **Next.js (App Router)** | Static export capabilities (`output: 'export'`), file-based routing, SEO routing, and strong TypeScript integration. |
 | **Language** | **TypeScript** | Enforces strict type safety, prevents runtime errors, and demonstrates enterprise-level code quality. |
 | **Styling** | **Tailwind CSS** | Utility-first styling for high productivity, minimal bundle size, and native dark mode support. |
-| **Component System** | **Shadcn UI + Radix** | Accessible, custom-styled UI primitives built directly into the repository without vendor lock-in. |
+| **Component System** | **Shadcn UI + Base UI** | Accessible, custom-styled UI primitives built directly into the repository without vendor lock-in. |
 | **Icons** | **Lucide React** | Lightweight, consistent vector icon library. |
 | **Concurrency** | **Web Workers & Comlink** | Offloads heavy JS/Wasm CPU-bound operations (FFmpeg, canvas manipulation) off the main UI thread. |
 | **Hosting & CI/CD** | **Vercel / GitHub Pages** | Automated preview deployments per Pull Request, automated build checks, zero hosting cost. |
 
-### 3.2 High-Level Architecture Diagram
-
-```text
 ### 3.2 High-Level Architecture Diagram
 
 ```text
@@ -66,10 +63,10 @@
        │       ├── Standard JS/Canvas Tools (Synchronous UI Thread)
        │       └── Heavy Tools (Web Workers / WebAssembly)
        │
-       └──► LocalStorage State Sync (Zero Server Persistence)
+       └──► LocalStorage & URL State Sync (Zero Server Persistence)
                ├── Favorites Array (`local-tools:favorites`)
                ├── Recent Tools Timestamp Log (`local-tools:recent`)
-               └── URL Param Sync for Deep-linking
+               └── URL Hash Sync (`useSyncExternalStore`)
 ```
 
 ---
@@ -95,12 +92,14 @@ Local-Tools/
 │   │   │   ├── layout.tsx    # App Shell (Navbar, Footer)
 │   │   │   └── page.tsx      # Bento Grid Dashboard & Search
 │   │   ├── layout.tsx        # Root Providers & Fonts
+│   │   ├── globals.css       # Global Tailwind v4 OKLCH theme styles
 │   │   └── not-found.tsx     # 404 Error Stage
 │   ├── components/
 │   │   ├── home/             # Homepage components (tool-card.tsx)
-│   │   ├── icons/            # Brand & Tool SVG components (tool-icon.tsx, github-icon.tsx)
+│   │   ├── icons/            # Brand & Tool SVG components (logo-icon.tsx, tool-icon.tsx, github-icon.tsx)
 │   │   ├── navigation/       # Navigation components (navbar.tsx, command-menu.tsx)
-│   │   └── ui/               # Base UI / Shadcn primitives (button, card, input-group, etc.)
+│   │   ├── theme-provider.tsx# Next-themes dark/light mode wrapper
+│   │   └── ui/               # Base UI / Shadcn primitives (badge, button, card, command, dialog, dropdown-menu, input, input-group, sonner, tabs, textarea)
 │   ├── config/
 │   │   ├── tags.ts           # Strictly-typed ToolTag array
 │   │   └── tools.ts          # Metadata registry for all tools
@@ -146,9 +145,9 @@ The application will be developed iteratively in phases:
 
 ### Phase 1: Core Foundation & Framework Setup
 
-* Set up Next.js (App Router), TypeScript, Tailwind CSS, and Shadcn UI.
-* Build the global layout, search bar (Command-K modal), and dark mode toggle.
-* Configure static site export (`output: 'export'`) and Vercel GitHub integration.
+* Set up Next.js (App Router), TypeScript, Tailwind CSS v4, and Base UI / Shadcn UI primitives.
+* Build the global layout, search bar (Command-K modal), theme toggle, and URL-hash tab state synchronization.
+* Configure static site export (`output: 'export'`) and GitHub Actions Pages workflow.
 
 ### Phase 2: Lightweight Text & Developer Utilities (Fast Wins)
 
@@ -177,7 +176,7 @@ To maximize the project's impact as a developer portfolio, the following technic
 
 1. **Strict Zero-Server Data Flow:** Verification that no `fetch` or `XHR` calls send user input payload out of the browser.
 2. **Web Worker Task Delegation:** Heavy image conversions and diff algorithms run in web workers to preserve 60 FPS UI responsiveness.
-3. **Deep-Link URL State Synchronization:** Tool states (e.g., selected settings) sync with URL search params so users can bookmark tool states easily.
+3. **Deep-Link URL & State Synchronization:** Tool filters and tab states sync bi-directionally with URL search params/hashes so users can bookmark and share tool states.
 4. **Offline Capability (PWA):** Service worker caching enables full functionality without an active internet connection.
 
 ---
@@ -199,5 +198,5 @@ The initial MVP will be considered complete when:
 1. Core project architecture and UI design system are established.
 2. At least **3 functional client-side tools** are implemented.
 3. Universal Command-K search works across all registered tools.
-4. Static export passes without build errors and is deployed live via Github Pages | Vercel.
+4. Static export passes without build errors and is deployed live via GitHub Pages.
 5. GitHub repository contains clear documentation, setup instructions, and open-source contribution guidelines.

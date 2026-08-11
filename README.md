@@ -1,3 +1,5 @@
+<!-- README.md -->
+
 # 🛠️ LocalTools
 
 > **LocalTools** is an open-source, privacy-first collection of fast online utilities that run 100% locally in your browser. No server uploads, no sign-ups, and no data tracking.

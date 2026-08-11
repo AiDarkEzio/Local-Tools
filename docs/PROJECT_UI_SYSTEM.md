@@ -18,6 +18,7 @@ This document serves as the single source of truth for the project's UI design s
 | **Command Palette** | `cmdk` | Accessible command menu engine |
 | **Icon Library** | `lucide-react` | Standard vector icon set |
 | **Theme Manager** | `next-themes` | Class-based dark/light mode toggle (`.dark` class on `<html>`) |
+| **Toasts** | `sonner` | Toast notification system (`<Toaster />` from `@/components/ui/sonner`) |
 
 ---
 
@@ -123,20 +124,37 @@ The project uses **Tailwind CSS v4** with **OKLCH color space** variables for hi
 
 - **Variants**: `default`, `secondary`, `destructive`, `outline`
 
-### 3. `InputGroup` (`@/components/ui/input-group`)
+### 3. `Card` (`@/components/ui/card`)
+
+- **Sub-components**: `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`
+
+### 4. `Tabs` (`@/components/ui/tabs`)
+
+- **Engine**: `@base-ui/react/tabs`
+- **Sub-components**: `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
+
+### 5. `Textarea` (`@/components/ui/textarea`)
+
+- Form styled responsive multi-line input box.
+
+### 6. `InputGroup` (`@/components/ui/input-group`)
 
 - **Sub-components**: `InputGroup`, `InputGroupAddon`, `InputGroupInput`, `InputGroupButton`, `InputGroupText`, `InputGroupTextarea`
 
-### 4. `DropdownMenu` (`@/components/ui/dropdown-menu`)
+### 7. `DropdownMenu` (`@/components/ui/dropdown-menu`)
 
 - **Engine**: `@base-ui/react/menu`
 - **Sub-components**: `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuItem`, `DropdownMenuSeparator`
 
-### 5. `Command` & `CommandDialog` (`@/components/ui/command`)
+### 8. `Command` & `CommandDialog` (`@/components/ui/command`)
 
 - **Engine**: `cmdk` + Custom Dialog wrapper
 
-### 6. Custom Application Hooks (`src/hooks/*`)
+### 9. `Sonner` Toaster (`@/components/ui/sonner`)
+
+- Toast container powered by `sonner` and `next-themes` integration.
+
+### 10. Custom Application Hooks (`src/hooks/*`)
 
 - **`useFavorites`**: Manages favorite tool IDs with `localStorage` persistence (`local-tools:favorites`) and `sonner` toast alerts.
 - **`useRecentTools`**: Logs recently selected tool timestamps in `localStorage` (`local-tools:recent`).
@@ -252,7 +270,7 @@ function CommandDialog({ children, ...props }: React.ComponentProps<typeof Dialo
 
 ---
 
-### ⛔ Rule 5: Hydration Guarding without `useEffect` Cascades
+### 5. Hydration Guarding without `useEffect` Cascades
 
 To prevent React 19 / Compiler errors (`setState synchronously within an effect`), use `useSyncExternalStore` for client-side mounting checks (e.g., theme toggles):
 
@@ -311,25 +329,13 @@ When creating asymmetrical grid layouts with varying column/row spans (`2x2`, `2
 
 ---
 
-### ⛔ Rule 8: Synchronize `localStorage` / Browser Stores via `useSyncExternalStore`
+### ⛔ Rule 8: Synchronize Browser Stores (`localStorage`, URL Hashes) via `useSyncExternalStore`
 
-Do **not** read `localStorage` inside `useEffect` and immediately call `setState()` [1]. This triggers React 19 / Compiler linter errors due to cascading re-renders [1].
+Do **not** read `localStorage` or `window.location.hash` inside `useEffect` and immediately call `setState()`. This triggers React 19 / Compiler linter errors (`react-hooks/set-state-in-effect`) due to cascading re-renders.
 
-Instead, subscribe to external storage using React's built-in `useSyncExternalStore` and emit custom events for same-tab updates [2, 3].
+Instead, subscribe to external browser storage and location sources using React's built-in `useSyncExternalStore`.
 
-- 🔴 Incorrect (Triggers `react-hooks/set-state-in-effect` Linter Error)
-
-```typescript
-// ❌ Avoid: Causes cascading re-renders on mount
-const [items, setItems] = React.useState<string[]>([]);
-
-React.useEffect(() => {
-  const stored = localStorage.getItem("my-key");
-  if (stored) setItems(JSON.parse(stored)); // ESLint Error!
-}, []);
-```
-
-- 🟢 Correct (React 19 Zero-Warning External Store Pattern)
+#### Example 1: Synchronizing `localStorage`
 
 ```typescript
 const STORAGE_EVENT = "local-tools:settings-change";
@@ -339,7 +345,7 @@ function subscribe(callback: () => void) {
   window.addEventListener(STORAGE_EVENT, callback);
   return () => {
     window.removeEventListener("storage", callback);
-    window.removeEventListener(STORAGE_EVENT, callback);
+    window.removeEventListener("storage", callback);
   };
 }
 
@@ -362,4 +368,28 @@ export function useMySettings() {
 
   return { data, updateData };
 }
+```
+
+#### Example 2: Synchronizing URL Hash (`window.location.hash`)
+
+```typescript
+function subscribeHash(callback: () => void) {
+  window.addEventListener("hashchange", callback);
+  window.addEventListener("popstate", callback);
+  return () => {
+    window.removeEventListener("hashchange", callback);
+    window.removeEventListener("popstate", callback);
+  };
+}
+
+function getHashSnapshot(): string {
+  return typeof window !== "undefined" ? window.location.hash : "";
+}
+
+function getHashServerSnapshot(): string {
+  return "";
+}
+
+// Inside Component: derive state synchronously during render without setState in effect
+const rawHash = React.useSyncExternalStore(subscribeHash, getHashSnapshot, getHashServerSnapshot);
 ```

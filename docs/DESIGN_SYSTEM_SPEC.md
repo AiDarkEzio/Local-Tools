@@ -51,6 +51,8 @@ We will use the **Tailwind `zinc` palette** paired with an **`emerald` active ac
 
 * **Sticky Top:** `sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/80`
 * **Left Side:** Logo (Terminal icon + Mono font title `Local.Tools`) + Responsive Categories Navigation Dropdown (`DropdownMenu` with adaptive label `hidden sm:inline`).
+  * **Conditional Visibility:** The Category Dropdown is conditionally rendered on subpages (`!isHomePage` / `pathname !== "/"`) and hidden on the home page to avoid visual redundancy with homepage filter pills.
+  * **Composite Quick Filters:** Navigation items dynamically composite injected quick filter anchors (`/#favorites`, `/#recent`) alongside standard category routes (`/#dev`, `/#text`, etc.) without mutating base category definitions.
 * **Center / Right Side:**
   * **Command Palette Button:** Collapses into a square icon button (`w-8`) on mobile (<640px) and expands into a full search trigger input (`sm:w-48 md:w-56`) with a `⌘K` badge on desktop.
   * **GitHub Repo Link Button:** Displays GitHub icon (`size="icon-sm"`).
@@ -61,6 +63,8 @@ We will use the **Tailwind `zinc` palette** paired with an **`emerald` active ac
 1. **Hero Section:**
    * Headline: Crisp, high-contrast headline (e.g., *"Fast, private utilities. 100% Client-Side."*).
    * Search Bar: Prominent input field with category filter pills underneath (`All`, `Favorites`, `Recently Used`, ...[`@/config/tools.ts` -> `ToolCategory`]).
+   * **URL Hash Anchor Two-Way Sync:** Filter pills synchronize bi-directionally with URL fragment identifiers (`/#dev`, `/#favorites`, `/#recent`, `/#all`). Switching tabs updates the URL anchor, and entering/sharing anchor URLs automatically activates the corresponding tab via `useSyncExternalStore`.
+   * **Invalid Hash Error Handling:** If an unrecognized hash anchor is loaded (e.g., `/#invalid-category`), a `sonner` toast error notification alerts the user, the address bar cleans the invalid hash, and the page gracefully falls back to showing all tools.
 
 2. **Dynamic Bento Grid Occupancy & Dense Packing:**
    * Bento Grid slots are calculated **dynamically** from each tool's metadata properties (`featured`, `gridSpan`, and `order`) in `@/config/tools.ts`.
@@ -96,7 +100,7 @@ Every tool page must adopt one of three standardized responsive layout archetype
 
 * **Outer Container:** `w-full border-t border-border/60 bg-muted/20 py-6 text-xs text-muted-foreground`
 * **Layout Structure:** `flex flex-col items-center justify-between gap-3 px-4 sm:flex-row sm:px-6`
-* **Left Branding Block:** Flex-wrapping container (`flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-center sm:text-left`) keeping icon and title grouped while allowing the tagline to wrap gracefully on mobile viewports (<640px).
+* **Left Branding Block:** Flex-wrapping container keeping icon and title grouped while allowing the tagline to wrap gracefully on mobile viewports (<640px).
 * **Right Meta Links:** Monospace text links (`Zero Server Requests • MIT License`) centered on mobile screens and right-aligned on desktop.
 
 ---
@@ -105,7 +109,7 @@ Every tool page must adopt one of three standardized responsive layout archetype
 
 1. **Instant Feedback Toasts:**
    * Integrate `sonner` for toast notifications.
-   * Clicking "Copy Output" triggers: `toast.success("Copied to clipboard!", { duration: 2000 })`.
+   * Clicking "Copy Output" or triggering invalid filter alerts shows a sleek notification toast.
 2. **Keyboard Shortcuts:**
    * Global `Cmd + K` / `Ctrl + K` to open the search command palette (using Shadcn `<Command />`).
    * Tool-specific shortcuts (e.g., `Cmd + Enter` to trigger conversion/formatting).
