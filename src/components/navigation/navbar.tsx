@@ -20,7 +20,8 @@ import { CommandMenu } from "@/components/navigation/command-menu";
 import { ToolCategory } from "@/config/tools";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES: { id: ToolCategory; label: string }[] = [
+// Base Category List (prepared for future centralization)
+const BASE_CATEGORIES: { id: string; label: string }[] = [
   { id: "dev", label: "Developer Tools" },
   { id: "text", label: "Text & Formatting" },
   { id: "image", label: "Image Utilities" },
@@ -33,6 +34,15 @@ const CATEGORIES: { id: ToolCategory; label: string }[] = [
   { id: "video-audio", label: "Video & Audio" },
 ];
 
+// Injected anchor links for Quick Filters
+const INJECTED_ANCHORS: { id: string; label: string }[] = [
+  { id: "favorites", label: "Favorited Utilities" },
+  { id: "recent", label: "Recently Used" },
+];
+
+// Dynamically composite without mutating BASE_CATEGORIES directly
+const CATEGORIES = [...INJECTED_ANCHORS, ...BASE_CATEGORIES];
+
 const emptySubscribe = () => () => {};
 
 export function Navbar() {
@@ -40,7 +50,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [commandOpen, setCommandOpen] = React.useState(false);
 
-  // Check if current page is the root/home page
+  // Detect homepage route (strips basePath automatically)
   const isHomePage = pathname === "/";
 
   // Safely detect client hydration without useEffect render cascades

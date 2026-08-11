@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Search, X, Star, Clock, Terminal, BadgeCheck } from "lucide-react";
+import { toast } from "sonner";
 import { TOOLS, ToolCategory } from "@/config/tools";
 import { ToolCard } from "@/components/home/tool-card";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -27,12 +28,77 @@ const CATEGORY_LABELS: Record<ToolCategory, string> = {
 
 type FilterTab = "all" | "favorites" | "recent" | ToolCategory;
 
+const VALID_TABS: FilterTab[] = [
+  "all",
+  "favorites",
+  "recent",
+  ...(Object.keys(CATEGORY_LABELS) as ToolCategory[]),
+];
+
+// External Store Subscription for browser URL hash
+function subscribeHash(callback: () => void) {
+  window.addEventListener("hashchange", callback);
+  window.addEventListener("popstate", callback);
+  return () => {
+    window.removeEventListener("hashchange", callback);
+    window.removeEventListener("popstate", callback);
+  };
+}
+
+function getHashSnapshot(): string {
+  return typeof window !== "undefined" ? window.location.hash : "";
+}
+
+function getHashServerSnapshot(): string {
+  return "";
+}
+
 export default function Home() {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [activeTab, setActiveTab] = React.useState<FilterTab>("all");
 
   const { isFavorite, toggleFavorite, favorites } = useFavorites();
   const { recentIds, addRecentTool } = useRecentTools();
+
+  // Subscribe to browser URL location hash synchronously without setState-in-effect
+  const rawHashWithSymbol = React.useSyncExternalStore(
+    subscribeHash,
+    getHashSnapshot,
+    getHashServerSnapshot
+  );
+
+  const rawHash = rawHashWithSymbol.replace("#", "").trim();
+
+  // Derive activeTab synchronously during render
+  const activeTab = React.useMemo<FilterTab>(() => {
+    if (!rawHash || rawHash === "all") return "all";
+    if (VALID_TABS.includes(rawHash as FilterTab)) {
+      return rawHash as FilterTab;
+    }
+    return "all"; // Fallback to "all" for invalid hashes
+  }, [rawHash]);
+
+  // Toast notification & URL cleanup for invalid hash
+  React.useEffect(() => {
+    if (rawHash && rawHash !== "all" && !VALID_TABS.includes(rawHash as FilterTab)) {
+      toast.error("Category Not Found", {
+        description: `"${rawHash}" is not a recognized category. Displaying all tools instead.`,
+        id: "invalid-category-toast",
+      });
+      // Clean invalid hash from browser address bar
+      window.history.replaceState(null, "", window.location.pathname);
+      window.dispatchEvent(new Event("hashchange"));
+    }
+  }, [rawHash]);
+
+  // Tab click handler updates URL anchor (which automatically triggers store update)
+  const handleTabChange = (tab: FilterTab) => {
+    if (tab === "all") {
+      window.history.pushState(null, "", window.location.pathname);
+      window.dispatchEvent(new Event("hashchange"));
+    } else {
+      window.location.hash = tab;
+    }
+  };
 
   // Filter tools based on active tab and search query
   const filteredTools = React.useMemo(() => {
@@ -73,7 +139,7 @@ export default function Home() {
 
   const handleClearFilters = () => {
     setSearchQuery("");
-    setActiveTab("all");
+    handleTabChange("all");
   };
 
   return (
@@ -104,7 +170,7 @@ export default function Home() {
 
         {/* Search Input Box */}
         <div className="w-full max-w-xl mt-8">
-          <InputGroup className="h-11 rounded-xl border-border/80 bg-card/80 shadow-xs focus-within:border-emerald-500 focus-within:ring-emerald-500/20">
+          <InputGroup className="h-11 rounded-xl border-border/80 bg-card/80 shadow-xs has-[input:focus-visible]:border-emerald-500 focus-within:ring-emerald-500/20">
             <InputGroupAddon align="inline-start" className="pl-3.5 text-muted-foreground">
               <Search className="w-4 h-4" />
             </InputGroupAddon>
@@ -134,7 +200,7 @@ export default function Home() {
           <Button
             variant={activeTab === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setActiveTab("all")}
+            onClick={() => handleTabChange("all")}
             className={cn(
               "h-8 text-xs rounded-full px-3 transition-all",
               activeTab === "all" ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium" : "text-muted-foreground"
@@ -146,7 +212,7 @@ export default function Home() {
           <Button
             variant={activeTab === "favorites" ? "default" : "outline"}
             size="sm"
-            onClick={() => setActiveTab("favorites")}
+            onClick={() => handleTabChange("favorites")}
             className={cn(
               "h-8 text-xs rounded-full px-3 gap-1.5 transition-all",
               activeTab === "favorites" ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium" : "text-muted-foreground"
@@ -159,7 +225,7 @@ export default function Home() {
           <Button
             variant={activeTab === "recent" ? "default" : "outline"}
             size="sm"
-            onClick={() => setActiveTab("recent")}
+            onClick={() => handleTabChange("recent")}
             className={cn(
               "h-8 text-xs rounded-full px-3 gap-1.5 transition-all",
               activeTab === "recent" ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400 font-medium" : "text-muted-foreground"
@@ -179,7 +245,7 @@ export default function Home() {
                 key={cat}
                 variant={isActive ? "default" : "ghost"}
                 size="sm"
-                onClick={() => setActiveTab(cat)}
+                onClick={() => handleTabChange(cat)}
                 className={cn(
                   "h-8 text-xs rounded-full px-3 transition-all",
                   isActive
