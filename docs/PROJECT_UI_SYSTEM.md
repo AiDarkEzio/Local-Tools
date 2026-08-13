@@ -112,9 +112,17 @@ The project uses **Tailwind CSS v4** with **OKLCH color space** variables for hi
 
 ---
 
-## 3. 🧩 Component & Data Catalog (`src/components/ui/*`, `src/config/*`, `src/hooks/*`)
+## 3. 🧩 Component & Data Catalog (`src/components/*`, `src/config/*`, `src/hooks/*`)
 
-### UI Components
+### Layout Components (`src/components/layouts/*`)
+
+1. **`ToolShell`** (`@/components/layouts/tool-shell`): Outer layout container providing responsive max-width bounds, padding, and ambient background glow.
+2. **`ToolHeader`** (`@/components/layouts/tool-header`): Unified header with breadcrumb navigation, category pastel badges, favorite star toggle (`useFavorites`), and automatic recent tool tracking (`useRecentTools`).
+3. **`SplitPaneLayout`** (`@/components/layouts/split-pane-layout`): Archetype 1 wrapper for data transformation and code/text processing tools.
+4. **`FocusCanvasLayout`** (`@/components/layouts/focus-canvas-layout`): Archetype 2 wrapper for visual media, canvas editing, and file tools.
+5. **`CompactCardLayout`** (`@/components/layouts/compact-card-layout`): Archetype 3 wrapper for generators, calculators, and low-input utilities.
+
+### UI Components (`src/components/ui/*`)
 
 1. **`Button`** (`@/components/ui/button`): Base UI button engine supporting `default`, `outline`, `secondary`, `ghost`, `destructive`, `link` variants and custom sizes (`xs`, `sm`, `icon-xs`, `icon-sm`, etc.).
 2. **`Badge`** (`@/components/ui/badge`): Inline badge supporting `default`, `secondary`, `destructive`, `outline` variants.

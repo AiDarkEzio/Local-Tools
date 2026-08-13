@@ -5,7 +5,7 @@
 **Project Name:** Local-Tools  
 **Project Type:** Open-Source Client-Side Utility Web Application  
 **Target Platform:** Web (Desktop & Mobile, Progressive Web App)  
-**Author:** @AiDarkEzio
+**Author:** @AiDarkEzio  
 **Status:** MVP Active Implementation Phase  
 **License:** MIT
 
@@ -62,6 +62,12 @@
        │
        ├──► Central Tool Registry (config/tools.ts)
        │
+       ├──► Standard Layout Archetypes (components/layouts/*)
+       │       ├── tool-shell.tsx & tool-header.tsx
+       │       ├── split-pane-layout.tsx (Transformation Tools)
+       │       ├── focus-canvas-layout.tsx (Media & Canvas Tools)
+       │       └── compact-card-layout.tsx (Generators & Calculators)
+       │
        ├──► Local Tool Components (Client Execution Only)
        │       ├── Standard JS/Canvas Tools (Synchronous UI Thread)
        │       └── Heavy Tools (Web Workers / WebAssembly)
@@ -101,6 +107,7 @@ Local-Tools/
 │   ├── components/
 │   │   ├── home/             # Homepage components (tool-card.tsx)
 │   │   ├── icons/            # Brand & Tool SVG components (logo-icon.tsx, tool-icon.tsx, github-icon.tsx)
+│   │   ├── layouts/          # Standard tool page archetypes (tool-shell, tool-header, split-pane-layout, focus-canvas-layout, compact-card-layout)
 │   │   ├── navigation/       # Navigation components (navbar.tsx, command-menu.tsx)
 │   │   ├── theme-provider.tsx# Next-themes dark/light mode wrapper
 │   │   └── ui/               # Base UI / Shadcn primitives (badge, button, card, command, dialog, dropdown-menu, input, input-group, sonner, tabs, textarea)
@@ -187,6 +194,7 @@ The application will be developed iteratively in phases:
 * Set up Next.js (App Router), TypeScript, Tailwind CSS v4, and Base UI / Shadcn UI primitives.
 * Build global shell, navigation bar, search bar (Command-K modal), theme toggle, and URL-hash tab state synchronization.
 * Implement centralized category system (`categories.ts`) with pastel color identity.
+* Implement 3 standardized tool page layout archetypes (`components/layouts/*`).
 * Configure static site export (`output: 'export'`) and GitHub Actions Pages workflow.
 
 ### Phase 2: Lightweight Text & Developer Utilities (Fast Wins)
@@ -236,7 +244,8 @@ To maximize the project's impact as a developer portfolio, the following technic
 The initial MVP will be considered complete when:
 
 1. Core project architecture and UI design system are established.
-2. At least **3 functional client-side tools** are implemented.
-3. Universal Command-K search works across all registered tools.
-4. Static export passes without build errors and is deployed live via GitHub Pages.
-5. GitHub repository contains clear documentation, setup instructions, and open-source contribution guidelines.
+2. Reusable tool layout archetypes (`SplitPaneLayout`, `FocusCanvasLayout`, `CompactCardLayout`) are built and integrated.
+3. At least **3 functional client-side tools** are implemented.
+4. Universal Command-K search works across all registered tools.
+5. Static export passes without build errors and is deployed live via GitHub Pages.
+6. GitHub repository contains clear documentation, setup instructions, and open-source contribution guidelines.
