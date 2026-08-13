@@ -84,31 +84,38 @@
 
 ## How to Implement This Cleanly in Code
 
-To keep your code clean and scalable, don't re-create layouts from scratch for every new tool. Instead, build reusable **Layout Wrappers** in React:
+To keep code clean and scalable, tools should consume the reusable **Layout Wrappers** located in `src/components/layouts/`:
 
-### Example Directory Structure
+### Component Directory Structure
 
 ```text
 src/components/
 └── layouts/
-    ├── ToolHeader.tsx             # Shared header with breadcrumbs & title
-    ├── SplitPaneLayout.tsx        # Archetype 1
-    ├── FocusCanvasLayout.tsx      # Archetype 2
-    └── CompactCardLayout.tsx      # Archetype 3
+    ├── tool-shell.tsx             # Shared outer container & glow background
+    ├── tool-header.tsx            # Shared header with breadcrumbs, title, badges & favorite toggle
+    ├── split-pane-layout.tsx      # Archetype 1 (Transformation tools)
+    ├── focus-canvas-layout.tsx    # Archetype 2 (Visual media & canvas tools)
+    └── compact-card-layout.tsx    # Archetype 3 (Generators & calculators)
 ```
 
 ### Example Usage in a Tool Page (`src/app/tools/json-formatter/page.tsx`)
 
 ```tsx
-import { SplitPaneLayout } from "@/components/layouts/SplitPaneLayout";
+import { SplitPaneLayout } from "@/components/layouts/split-pane-layout";
 
 export default function JsonFormatterPage() {
   return (
     <SplitPaneLayout
+      toolId="json-formatter"
       title="JSON Formatter"
-      description="Prettify and validate JSON strings instantly."
-      leftPanel={<JsonInputEditor />}
-      rightPanel={<JsonOutputViewer />}
+      description="Prettify, validate, and minify JSON strings instantly."
+      category="dev"
+      icon="FileJson"
+      tags={["formatter", "validator"]}
+      leftPaneTitle="Input JSON"
+      rightPaneTitle="Formatted Output"
+      leftPane={<JsonInputEditor />}
+      rightPane={<JsonOutputViewer />}
     />
   );
 }
