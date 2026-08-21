@@ -2,7 +2,9 @@
 
 # 🚨 Critical Architectural Rules & Best Practices
 
-Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI and target **React 19 / Next.js 16**, follow these rules to avoid TypeScript, React Compiler, and runtime errors.
+Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI and targets **React 19 / Next.js 16**, follow these rules to avoid TypeScript, React Compiler, and runtime errors.
+
+---
 
 ## ⛔ Rule 1: Do NOT use `asChild` on Base UI Components
 
@@ -174,42 +176,7 @@ Do **not** read `localStorage` or `window.location.hash` inside `useEffect` and 
 
 Instead, subscribe to external browser storage and location sources using `useSyncExternalStore`, and update browser URL state via `window.history.pushState`:
 
-### Example 1: Synchronizing `localStorage`
-
-```typescript
-const STORAGE_EVENT = "local-tools:settings-change";
-
-function subscribe(callback: () => void) {
-  window.addEventListener("storage", callback);
-  window.addEventListener(STORAGE_EVENT, callback);
-  return () => {
-    window.removeEventListener("storage", callback);
-    window.removeEventListener(STORAGE_EVENT, callback);
-  };
-}
-
-function getSnapshot() {
-  return localStorage.getItem("my-key") || "[]";
-}
-
-function getServerSnapshot() {
-  return "[]";
-}
-
-export function useMySettings() {
-  const rawData = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const data = React.useMemo(() => JSON.parse(rawData), [rawData]);
-
-  const updateData = (newValue: any) => {
-    localStorage.setItem("my-key", JSON.stringify(newValue));
-    window.dispatchEvent(new Event(STORAGE_EVENT)); // Notifies all hook instances
-  };
-
-  return { data, updateData };
-}
-```
-
-### Example 2: Synchronizing URL Hash (`window.location.hash`)
+### Example: Synchronizing URL Hash (`window.location.hash`)
 
 ```typescript
 function subscribeHash(callback: () => void) {
@@ -238,4 +205,72 @@ const handleTabChange = (tab: CategoryFilterKey) => {
   window.history.pushState(null, "", newUrl);
   window.dispatchEvent(new Event("hashchange"));
 };
+```
+
+---
+
+## ⛔ Rule 9: Debounce Asynchronous Canvas & Media Computations (`canvas.toBlob`, OffscreenCanvas)
+
+When building tools that modify media in real-time (sliders for quality, dimensions, filters), running asynchronous `canvas.toBlob()` or `canvas.drawImage()` synchronously on every input tick causes:
+
+1. React Compiler `react-hooks/set-state-in-effect` errors.
+2. Race condition loops where `isProcessing` state gets stuck forever.
+3. Severe UI stutter and memory thrashing from rapid Object URL creations.
+
+### Best Practice Pattern
+
+1. **Cache decoded image in a `ref`:** Decode the uploaded `File` once into an `HTMLImageElement` stored in `cachedImgRef.current`.
+2. **Debounce the re-encoding effect (200–250ms):** Allow slider dragging to remain 60 FPS while postponing heavy canvas operations until dragging settles.
+3. **Use cancellation flags (`isActive = false`):** Ignore stale async callbacks when settings change mid-processing.
+4. **Revoke old Object URLs safely:** Clean up previous blob URLs whenever a new blob is produced.
+
+- 🟢 Correct Pattern (`src/app/(app)/tools/image-compressor/page.tsx`)
+
+```tsx
+React.useEffect(() => {
+  const img = cachedImgRef.current;
+  if (!img || targetWidth <= 0 || targetHeight <= 0) return;
+
+  let isActive = true;
+
+  // 200ms debounce prevents UI lockup during slider drags
+  const debounceTimer = setTimeout(() => {
+    setIsProcessing(true);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      setIsProcessing(false);
+      return;
+    }
+
+    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+    canvas.toBlob(
+      (blob) => {
+        if (!isActive || !blob) {
+          setIsProcessing(false);
+          return;
+        }
+
+        setCompressedBlob(blob);
+        setCompressedSize(blob.size);
+        setCompressedUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
+        setIsProcessing(false);
+      },
+      format,
+      quality / 100
+    );
+  }, 200);
+
+  return () => {
+    isActive = false;
+    clearTimeout(debounceTimer);
+  };
+}, [originalFile, targetWidth, targetHeight, format, quality]);
 ```

@@ -47,5 +47,14 @@
   "src/components/icons/tool-icon.tsx": true,
   "src/hooks/use-favorites.ts": true,
   "src/hooks/use-recent-tools.ts": true,
-  "docs/UI_BEST_PRACTICES.md": false
+  "docs/UI_BEST_PRACTICES.md": false,
+  "src/config/categories.ts": true,
+  "src/app/(app)/tools/image-compressor/page.tsx": true,
+  "src/app/(app)/tools/json-formatter/page.tsx": true,
+  "src/app/(app)/tools/password-generator/page.tsx": true,
+  "src/components/layouts/compact-card-layout.tsx": true,
+  "src/components/layouts/focus-canvas-layout.tsx": true,
+  "src/components/layouts/split-pane-layout.tsx": true,
+  "src/components/layouts/tool-header.tsx": true,
+  "src/components/layouts/tool-shell.tsx": true
 }
