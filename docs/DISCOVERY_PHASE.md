@@ -6,7 +6,7 @@
 **Project Type:** Open-Source Client-Side Utility Web Application  
 **Target Platform:** Web (Desktop & Mobile, Progressive Web App)  
 **Author:** @AiDarkEzio  
-**Status:** MVP Active Implementation Phase  
+**Status:** MVP Milestone Achieved (3 Reference Tools Live) / Phase 2 Active Expansion  
 **License:** MIT
 
 ---
@@ -44,11 +44,11 @@
 | :--- | :--- | :--- |
 | **Framework** | **Next.js (App Router)** | Static export capabilities (`output: 'export'`), file-based routing, SEO routing, and strong TypeScript integration. |
 | **Language** | **TypeScript** | Enforces strict type safety, prevents runtime errors, and demonstrates enterprise-level code quality. |
-| **Styling** | **Tailwind CSS** | Utility-first styling for high productivity, minimal bundle size, and native dark mode support. |
+| **Styling** | **Tailwind CSS v4** | Utility-first styling for high productivity, minimal bundle size, OKLCH colors, and native dark mode support. |
 | **Component System** | **Shadcn UI + Base UI** | Accessible, custom-styled UI primitives built directly into the repository without vendor lock-in. |
 | **Icons** | **Lucide React** | Lightweight, consistent vector icon library. |
-| **Concurrency** | **Web Workers & Comlink** | Offloads heavy JS/Wasm CPU-bound operations (FFmpeg, canvas manipulation) off the main UI thread. |
-| **Hosting & CI/CD** | **Vercel / GitHub Pages** | Automated preview deployments per Pull Request, automated build checks, zero hosting cost. |
+| **Concurrency** | **Web Workers & Canvas APIs** | Offloads heavy CPU-bound operations off the main UI thread. |
+| **Hosting & CI/CD** | **GitHub Pages / GitHub Actions** | Automated build checks, static export pipeline, zero hosting cost. |
 
 ### 3.2 High-Level Architecture Diagram
 
@@ -69,8 +69,9 @@
        │       └── compact-card-layout.tsx (Generators & Calculators)
        │
        ├──► Local Tool Components (Client Execution Only)
-       │       ├── Standard JS/Canvas Tools (Synchronous UI Thread)
-       │       └── Heavy Tools (Web Workers / WebAssembly)
+       │       ├── JSON Formatter & Validator (Native JSON & Blob APIs)
+       │       ├── Image Compressor & Resizer (HTML5 Canvas & toBlob)
+       │       └── Secure Password Generator (Web Cryptography API)
        │
        └──► LocalStorage & URL State Sync (Zero Server Persistence)
                ├── Favorites Array (`local-tools:favorites`)
@@ -100,7 +101,11 @@ Local-Tools/
 │   ├── app/                  # Next.js App Router (SSG Pages)
 │   │   ├── (app)/
 │   │   │   ├── layout.tsx    # App Shell (Navbar, Footer)
-│   │   │   └── page.tsx      # Bento Grid Dashboard & Search
+│   │   │   ├── page.tsx      # Bento Grid Dashboard & Search
+│   │   │   └── tools/
+│   │   │       ├── json-formatter/page.tsx      # Archetype 1 Reference Tool
+│   │   │       ├── image-compressor/page.tsx    # Archetype 2 Reference Tool
+│   │   │       └── password-generator/page.tsx  # Archetype 3 Reference Tool
 │   │   ├── layout.tsx        # Root Providers & Fonts
 │   │   ├── globals.css       # Global Tailwind v4 OKLCH theme styles
 │   │   └── not-found.tsx     # 404 Error Stage
@@ -125,107 +130,46 @@ Local-Tools/
 └── tsconfig.json
 ```
 
-### 4.2 Central Category & Tool Registries Contract
-
-All category metadata, display labels, visual dots, and pastel theme tokens are centralized in `@/config/categories.ts`:
-
-```typescript
-export type ToolCategory =
-  | 'dev'
-  | 'text'
-  | 'image'
-  | 'video-audio'
-  | 'document'
-  | 'security'
-  | 'math-finance'
-  | 'time'
-  | 'generators'
-  | 'unit-converter'
-  | 'games-edu';
-
-export type CategoryFilterKey = 'all' | 'favorites' | 'recent' | ToolCategory;
-
-export interface CategoryConfig {
-  id: CategoryFilterKey;
-  label: string;
-  dotColor: string;       // Indicator dot class (e.g. "bg-emerald-400")
-  pillBorder: string;     // Pastel border color for landing page filter pills
-  pillActiveBg: string;   // Active background state when pill is selected
-  badgeBg: string;        // Soft pastel background for Tool Card category badges
-  badgeText: string;      // Contrasting text color for Tool Card category badges
-  badgeBorder: string;    // Soft border for Tool Card category badges
-}
-
-export const CATEGORIES_MAP: Record<CategoryFilterKey, CategoryConfig>;
-export const ALL_FILTER_KEYS: CategoryFilterKey[];
-export function getCategoryConfig(key: string): CategoryConfig;
-```
-
-Every tool added to `Local-Tools` must fulfill the strongly-typed contract defined in `@/config/tools.ts`:
-
-```typescript
-export type GridSpan = '1x1' | '2x1' | '1x2' | '2x2';
-
-export interface Tool {
-  id: string;          // Unique identifier (e.g., 'json-formatter')
-  name: string;        // Display title
-  description: string; // Short SEO summary
-  category: ToolCategory;
-  path: string;        // Route path (e.g., '/tools/json-formatter')
-  icon: string;        // Lucide icon identifier
-  tags: ToolTag[];     // Strongly-typed tags from KNOWN_TAGS in @/config/tags
-  
-  // Feature & Grid Metadata
-  isNew?: boolean;     // Optional visual badge indicator
-  featured?: boolean;  // Displayed in Featured Bento section
-  gridSpan?: GridSpan; // Occupancy footprint in Bento Grid ('1x1', '2x1', '1x2', '2x2')
-  order?: number;      // Optional numeric priority sorting
-}
-```
-
 ---
 
 ## 5. Incremental Tool Roadmap
 
-The application will be developed iteratively in phases:
+### Phase 1: Core Foundation & Framework Setup `[COMPLETED]`
 
-### Phase 1: Core Foundation & Framework Setup
+* [x] Set up Next.js (App Router), TypeScript, Tailwind CSS v4, and Base UI / Shadcn UI primitives.
+* [x] Build global shell, navigation bar, search bar (Command-K modal), theme toggle, and URL-hash tab state synchronization.
+* [x] Implement centralized category system (`categories.ts`) with pastel color identity.
+* [x] Implement 3 standardized tool page layout archetypes (`components/layouts/*`).
+* [x] Configure static site export (`output: 'export'`) and GitHub Actions Pages workflow.
 
-* Set up Next.js (App Router), TypeScript, Tailwind CSS v4, and Base UI / Shadcn UI primitives.
-* Build global shell, navigation bar, search bar (Command-K modal), theme toggle, and URL-hash tab state synchronization.
-* Implement centralized category system (`categories.ts`) with pastel color identity.
-* Implement 3 standardized tool page layout archetypes (`components/layouts/*`).
-* Configure static site export (`output: 'export'`) and GitHub Actions Pages workflow.
+### Phase 2: Lightweight Text & Developer Utilities `[IN PROGRESS]`
 
-### Phase 2: Lightweight Text & Developer Utilities (Fast Wins)
+* [x] **JSON Formatter & Validator:** Prettify, minify, validate syntax, sort object keys, upload/download JSON. *(Archetype 1 Reference Tool)*
+* [x] **Secure Password Generator:** Cryptographically secure passwords with entropy score & character controls. *(Archetype 3 Reference Tool)*
+* [ ] **Base64 Encoder / Decoder:** Text and file-to-Base64 conversion.
+* [ ] **Hash Generator:** Client-side MD5, SHA-1, SHA-256 generation using `crypto.subtle`.
+* [ ] **Word & Character Counter:** Real-time text analytics.
 
-* **JSON Formatter & Validator:** Prettify, minify, and validate JSON strings.
-* **Base64 Encoder / Decoder:** Text and file-to-Base64 conversion.
-* **Hash Generator:** Client-side MD5, SHA-1, SHA-256 generation using `crypto.subtle`.
-* **Word & Character Counter:** Real-time text analytics.
+### Phase 3: Canvas & Media Processing `[IN PROGRESS]`
 
-### Phase 3: Canvas & Media Processing (Browser Native)
+* [x] **Image Compressor & Resizer:** Debounced HTML5 Canvas re-encoding, WEBP/JPEG/PNG format conversion, aspect-ratio locked resizing, and live savings metrics. *(Archetype 2 Reference Tool)*
+* [ ] **SVG to PNG Converter:** Client-side vector rasterization.
+* [ ] **Color Picker & Palette Generator:** Canvas image color extractor.
 
-* **Image Resizer & Cropper:** Uses HTML5 Canvas API to modify image dimensions locally.
-* **SVG to PNG Converter:** Client-side vector rasterization.
-* **Color Picker & Palette Generator:** Canvas image color extractor.
+### Phase 4: Advanced Utilities & Heavy Workers `[PLANNED]`
 
-### Phase 4: Advanced Utilities & Heavy Workers
-
-* **PDF Merge / Split:** Powered by `pdf-lib` (client-side PDF binary manipulation).
-* **Text Diff Checker:** Inline comparison of text strings.
-* **PWA Implementation:** Enable offline caching via Service Workers.
+* [ ] **PDF Merge / Split:** Powered by `pdf-lib` (client-side PDF binary manipulation).
+* [ ] **Text Diff Checker:** Inline comparison of text strings.
+* [ ] **PWA Implementation:** Enable offline caching via Service Workers.
 
 ---
 
 ## 6. Key Technical Benchmarks & Engineering Highlights
 
-To maximize the project's impact as a developer portfolio, the following technical capabilities will be implemented:
-
 1. **Strict Zero-Server Data Flow:** Verification that no `fetch` or `XHR` calls send user input payload out of the browser.
-2. **Web Worker Task Delegation:** Heavy image conversions and diff algorithms run in web workers to preserve 60 FPS UI responsiveness.
-3. **Deep-Link URL & State Synchronization:** Tool filters and tab states sync bi-directionally with URL search params/hashes so users can bookmark and share tool states.
-4. **Offline Capability (PWA):** Service worker caching enables full functionality without an active internet connection.
+2. **Debounced Canvas Execution:** Heavy image re-encoding tasks are debounced (~200ms) with in-memory image caching to maintain 60 FPS UI performance.
+3. **Web Cryptography API:** Native `window.crypto.getRandomValues` ensures true cryptographic randomness for security tools.
+4. **Deep-Link URL & State Synchronization:** Category filters sync bi-directionally with URL hash anchors (`useSyncExternalStore` + `history.pushState`).
 
 ---
 
@@ -233,19 +177,17 @@ To maximize the project's impact as a developer portfolio, the following technic
 
 | Identified Risk | Impact | Mitigation Strategy |
 | :--- | :--- | :--- |
-| **Large Bundle Sizes:** Heavy libraries (e.g., PDF parsers, WASM modules) slowing down initial page loads. | High | Use dynamic imports (`next/dynamic`) so each tool page only loads its specific JavaScript bundle on demand. |
-| **Browser Memory Limits:** Heavy image processing freezing the UI tab. | Medium | Offload execution to Web Workers and set maximum file upload warnings for client processing. |
-| **SEO for Static Routes:** Dynamic metadata issues in pure client build. | Low | Utilize Next.js `generateMetadata()` at build time for static routes to guarantee valid OpenGraph previews. |
+| **Large Bundle Sizes:** Heavy libraries slowing down initial loads. | High | Use dynamic imports (`next/dynamic`) and native browser APIs wherever possible. |
+| **Canvas Slider Thrashing:** Un-debounced image re-encoding causing UI freeze or memory thrashing. | Medium | Cache decoded `HTMLImageElement` in memory and debounce `canvas.toBlob` execution by 200ms with cancellation flags. |
+| **Browser Memory Limits:** Heavy image processing freezing the UI tab. | Medium | Revoke previous Object URLs immediately upon generating new blobs (`URL.revokeObjectURL`). |
 
 ---
 
-## 8. Definition of Done (MVP Milestone)
+## 8. Definition of Done (MVP Milestone) `[ACHIEVED]`
 
-The initial MVP will be considered complete when:
-
-1. Core project architecture and UI design system are established.
-2. Reusable tool layout archetypes (`SplitPaneLayout`, `FocusCanvasLayout`, `CompactCardLayout`) are built and integrated.
-3. At least **3 functional client-side tools** are implemented.
-4. Universal Command-K search works across all registered tools.
-5. Static export passes without build errors and is deployed live via GitHub Pages.
-6. GitHub repository contains clear documentation, setup instructions, and open-source contribution guidelines.
+* [x] Core project architecture and UI design system are established.
+* [x] Reusable tool layout archetypes (`SplitPaneLayout`, `FocusCanvasLayout`, `CompactCardLayout`) are built and integrated.
+* [x] At least **3 functional client-side tools** are implemented (JSON Formatter, Image Compressor, Password Generator).
+* [x] Universal Command-K search works across all registered tools.
+* [x] Static export passes without build errors and is deployed live via GitHub Pages.
+* [x] GitHub repository contains clear documentation, setup instructions, and open-source contribution guidelines.
