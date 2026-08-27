@@ -36,7 +36,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "FileJson",
     tags: ["formatter", "validator"],
     featured: true,
-    gridSpan: "2x2",
+    gridSpan: "2x1",
     order: 1,
   },
   {
@@ -48,7 +48,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "Image",
     tags: ["compressor", "editor"],
     featured: true,
-    gridSpan: "1x2",
+    gridSpan: "1x1", // 1x2
     order: 2,
   },
   {
@@ -60,7 +60,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "KeyRound",
     tags: ["generator"],
     featured: true,
-    gridSpan: "2x1",
+    gridSpan: "1x1", // 2x1
     order: 3,
   },
 ];
