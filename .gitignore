@@ -41,3 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 codebase_context.md
+tools.json
+src/app/(app)/_tools

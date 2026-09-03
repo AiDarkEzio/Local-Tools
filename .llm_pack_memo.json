@@ -56,5 +56,9 @@
   "src/components/layouts/focus-canvas-layout.tsx": true,
   "src/components/layouts/split-pane-layout.tsx": true,
   "src/components/layouts/tool-header.tsx": true,
-  "src/components/layouts/tool-shell.tsx": true
+  "src/components/layouts/tool-shell.tsx": true,
+  "src/app/(app)/_tools/image-compressor/page.tsx": false,
+  "src/app/(app)/_tools/json-formatter/page.tsx": false,
+  "src/app/(app)/_tools/password-generator/page.tsx": false,
+  "src/config/tools.json": true
 }
