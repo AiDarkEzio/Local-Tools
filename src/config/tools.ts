@@ -36,7 +36,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "FileJson",
     tags: ["formatter", "validator"],
     featured: true,
-    gridSpan: "2x1",
+    gridSpan: "1x1",
     order: 1,
   },
   {
