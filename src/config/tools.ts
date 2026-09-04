@@ -111,6 +111,18 @@ const ACTIVE_TOOLS: Tool[] = [
     gridSpan: "1x1",
     order: 7,
   },
+  {
+    id: "color-converter",
+    name: "Universal Color Code Converter",
+    description: "Convert HEX, RGB, HSL, HSV, OKLCH, and CMYK color codes with contrast checking.",
+    category: "image",
+    path: "/tools/color-converter",
+    icon: "Palette",
+    tags: ["converter", "viewer"],
+    featured: true,
+    gridSpan: "1x1",
+    order: 8,
+  },
 ];
 
 // const activeIds = new Set(ACTIVE_TOOLS.map((t) => t.id));
