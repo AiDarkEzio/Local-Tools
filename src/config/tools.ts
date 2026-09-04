@@ -99,6 +99,18 @@ const ACTIVE_TOOLS: Tool[] = [
     gridSpan: "1x1",
     order: 6,
   },
+  {
+    id: "word-counter",
+    name: "Word & Text Analyzer",
+    description: "Analyze word count, reading times, sentences, and keyword frequency.",
+    category: "text",
+    path: "/tools/word-counter",
+    icon: "AlignLeft",
+    tags: ["checker", "formatter"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 7,
+  },
 ];
 
 // const activeIds = new Set(ACTIVE_TOOLS.map((t) => t.id));
