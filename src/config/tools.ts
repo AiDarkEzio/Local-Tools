@@ -48,7 +48,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "Image",
     tags: ["compressor", "editor"],
     featured: true,
-    gridSpan: "1x1", // 1x2
+    gridSpan: "1x1",
     order: 2,
   },
   {
@@ -60,8 +60,20 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "KeyRound",
     tags: ["generator"],
     featured: true,
-    gridSpan: "1x1", // 2x1
+    gridSpan: "1x1",
     order: 3,
+  },
+  {
+    id: "word-counter",
+    name: "Word & Text Analyzer",
+    description: "Analyze word count, reading times, sentences, and keyword frequency.",
+    category: "text",
+    path: "/tools/word-counter",
+    icon: "AlignLeft",
+    tags: ["checker", "formatter"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 7,
   },
 ];
 
