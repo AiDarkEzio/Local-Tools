@@ -48,7 +48,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "Image",
     tags: ["compressor", "editor"],
     featured: true,
-    gridSpan: "1x1", // 1x2
+    gridSpan: "1x1",
     order: 2,
   },
   {
@@ -60,8 +60,20 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "KeyRound",
     tags: ["generator"],
     featured: true,
-    gridSpan: "1x1", // 2x1
+    gridSpan: "1x1",
     order: 3,
+  },
+  {
+    id: "hash-generator",
+    name: "SHA & MD5 Hash Generator",
+    description: "Compute MD5, SHA-1, SHA-256, and SHA-512 cryptographic checksum hashes.",
+    category: "security",
+    path: "/tools/hash-generator",
+    icon: "ShieldCheck",
+    tags: ["generator", "checker"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 5,
   },
 ];
 
