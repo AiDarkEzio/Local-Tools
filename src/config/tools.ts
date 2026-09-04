@@ -75,6 +75,18 @@ const ACTIVE_TOOLS: Tool[] = [
     gridSpan: "1x1",
     order: 4,
   },
+  {
+    id: "hash-generator",
+    name: "SHA & MD5 Hash Generator",
+    description: "Compute MD5, SHA-1, SHA-256, and SHA-512 cryptographic checksum hashes.",
+    category: "security",
+    path: "/tools/hash-generator",
+    icon: "ShieldCheck",
+    tags: ["generator", "checker"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 5,
+  },
 ];
 
 // const activeIds = new Set(ACTIVE_TOOLS.map((t) => t.id));
