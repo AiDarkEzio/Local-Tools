@@ -48,7 +48,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "Image",
     tags: ["compressor", "editor"],
     featured: true,
-    gridSpan: "1x1", // 1x2
+    gridSpan: "1x1",
     order: 2,
   },
   {
@@ -60,8 +60,20 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "KeyRound",
     tags: ["generator"],
     featured: true,
-    gridSpan: "1x1", // 2x1
+    gridSpan: "1x1",
     order: 3,
+  },
+  {
+    id: "base64-encoder",
+    name: "Base64 Encoder / Decoder",
+    description: "Convert text and binary files to and from Base64 string formats.",
+    category: "dev",
+    path: "/tools/base64-encoder",
+    icon: "Binary",
+    tags: ["encoder-decoder", "converter"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 4,
   },
 ];
 
