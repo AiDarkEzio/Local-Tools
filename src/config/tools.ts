@@ -87,6 +87,18 @@ const ACTIVE_TOOLS: Tool[] = [
     gridSpan: "1x1",
     order: 5,
   },
+  {
+    id: "case-converter",
+    name: "Text Case Converter",
+    description: "Transform text between camelCase, snake_case, PascalCase, and UPPERCASE.",
+    category: "text",
+    path: "/tools/case-converter",
+    icon: "Type",
+    tags: ["converter", "formatter"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 6,
+  },
 ];
 
 // const activeIds = new Set(ACTIVE_TOOLS.map((t) => t.id));
