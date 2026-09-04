@@ -64,6 +64,18 @@ const ACTIVE_TOOLS: Tool[] = [
     order: 3,
   },
   {
+    id: "base64-encoder",
+    name: "Base64 Encoder / Decoder",
+    description: "Convert text and binary files to and from Base64 string formats.",
+    category: "dev",
+    path: "/tools/base64-encoder",
+    icon: "Binary",
+    tags: ["encoder-decoder", "converter"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 4,
+  },
+  {
     id: "hash-generator",
     name: "SHA & MD5 Hash Generator",
     description: "Compute MD5, SHA-1, SHA-256, and SHA-512 cryptographic checksum hashes.",
