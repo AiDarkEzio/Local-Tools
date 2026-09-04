@@ -48,7 +48,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "Image",
     tags: ["compressor", "editor"],
     featured: true,
-    gridSpan: "1x1", // 1x2
+    gridSpan: "1x1",
     order: 2,
   },
   {
@@ -60,8 +60,20 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "KeyRound",
     tags: ["generator"],
     featured: true,
-    gridSpan: "1x1", // 2x1
+    gridSpan: "1x1",
     order: 3,
+  },
+  {
+    id: "color-converter",
+    name: "Universal Color Code Converter",
+    description: "Convert HEX, RGB, HSL, HSV, OKLCH, and CMYK color codes with contrast checking.",
+    category: "image",
+    path: "/tools/color-converter",
+    icon: "Palette",
+    tags: ["converter", "viewer"],
+    featured: true,
+    gridSpan: "2x1",
+    order: 8,
   },
 ];
 
