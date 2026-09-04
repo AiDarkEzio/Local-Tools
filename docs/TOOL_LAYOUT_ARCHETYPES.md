@@ -2,7 +2,7 @@
 
 # Deep Dive: The 3 Tool Layout Archetypes
 
-``` text
+```text
 +---------------------------------------------------------------------------------+
 |  ARCHETYPE 1: Split-Pane          ARCHETYPE 2: Canvas / Media   ARCHETYPE 3: Compact Single |
 |  (Transformation Tools)           (Editing & Media Tools)       (Generators & Calculators)  |
@@ -17,25 +17,32 @@
 
 ---
 
-## Archetype 1: The Split-Pane Layout (Transformation Tools)
+## Archetype 1: The Split-Pane Layout (`SplitPaneLayout`)
 
-* **When to use:** Whenever the user gives a block of text/data, and the tool processes it into a *new* block of text/data.
-* **Examples:** JSON Formatter, Base64 Encoder/Decoder, Text Diff Checker, CSV to JSON, JWT Decoder, Markdown Previewer.
+* **When to use:** Whenever the user gives a block of text/data, and the tool processes it into a transformed block of text, structured cards, or detailed analytics.
+* **Live Implementations:**
+  * **JSON Formatter & Validator** (`/tools/json-formatter`)
+  * **Base64 Encoder / Decoder** (`/tools/base64-encoder`)
+  * **SHA & MD5 Hash Generator** (`/tools/hash-generator`)
+  * **Text Case Converter** (`/tools/case-converter`)
+  * **Word & Text Analyzer** (`/tools/word-counter`)
+* **Upcoming Planned Implementations:** Text Diff Checker, JWT Token Inspector, Regex Matcher, Markdown Live Previewer.
 * **Why it works in-depth:**
   * **Real-time feedback loop:** As the user types or pastes into the left panel, the right panel updates instantly.
-  * **Side-by-side comparison:** The user can visually compare the original raw data vs. the formatted/transformed result without scrolling.
-  * **Desktop screen efficiency:** On widescreen desktop monitors, side-by-side takes full advantage of horizontal space.
-* **Mobile behavior:** Automatically stacks vertically (Input on top, Output on bottom) using Tailwind's `grid-cols-1 lg:grid-cols-2`.
+  * **Side-by-side comparison:** Visually compare the original raw data vs. transformed outputs without vertical scroll fatigue.
+  * **Desktop screen efficiency:** Takes full advantage of horizontal space on desktop monitors while collapsing vertically (`grid-cols-1 lg:grid-cols-2`) on mobile.
 
 ---
 
-## Archetype 2: Focus Canvas + Sidebar (Visual & Media Tools)
+## Archetype 2: Focus Canvas + Sidebar (`FocusCanvasLayout`)
 
-* **When to use:** Visual editing, file manipulation, canvas tools, or tools where the visual preview needs maximum screen space.
-* **Examples:** Image Cropper, SVG Optimizer/Viewer, PDF Page Remover, Color Palette Picker, Audio Trimmer.
+* **When to use:** Visual editing, media manipulation, canvas tools, or utilities where a dominant visual preview needs maximum workspace.
+* **Live Implementations:**
+  * **Image Compressor & Resizer** (`/tools/image-compressor`)
+* **Upcoming Planned Implementations:** SVG Vector Converter, Image Dimensions Resizer, Color Palette Extractor, PDF Page Merger.
 * **Layout Structure:**
-  * **Main Stage (70% width):** Large workspace displaying the visual preview or canvas.
-  * **Controls Sidebar (30% width):** Sliders, quality dropdowns, file upload buttons, and action buttons ("Export PNG", "Compress").
+  * **Main Stage (approx. 60–70% width):** Large workspace displaying the visual canvas, drag-and-drop zone, or file preview.
+  * **Controls Sidebar (approx. 30–40% width):** Sliders, quality dropdowns, format switches, dimensions inputs, and export triggers.
 
 ```text
 +-----------------------------------------------------------------------+
@@ -54,39 +61,43 @@
 
 ---
 
-## Archetype 3: Compact Single-Panel / Card Layout (Generators)
+## Archetype 3: Compact Single-Panel / Card Layout (`CompactCardLayout`)
 
-* **When to use:** Tools that don't need a large input area—just a few buttons/switches and a clear result display.
-* **Examples:** UUID/GUID Generator, Password Generator, QR Code Generator, Hash (MD5/SHA256) Generator, Cron Expression Parser.
+* **When to use:** Generators, color inspectors, and calculators that operate with targeted controls and a clean summary result display.
+* **Live Implementations:**
+  * **Secure Password Generator** (`/tools/password-generator`)
+  * **Universal Color Code Converter** (`/tools/color-converter`)
+* **Upcoming Planned Implementations:** UUID / GUID Generator, Unix Epoch Timestamp Tool, Byte & Data Unit Converter, EMI & Loan Calculator.
 * **Layout Structure:**
-  * A single, sleek, centered card (`max-w-2xl mx-auto`).
-  * Top section: Options (length sliders, toggles for numbers/symbols).
-  * Bottom section: Prominent output box with a large "Copy" button.
+  * A single, centered card container (`max-w-2xl` or `max-w-3xl mx-auto`).
+  * Top / Middle section: Interactive configuration controls (swatches, sliders, checkboxes, universal input bar).
+  * Bottom section: Result cards with one-click copy buttons and diagnostics (e.g. entropy scores, WCAG contrast badges).
 
 ```text
 +-----------------------------------------------------------------------+
-| Header: Secure Password Generator                                     |
+| Header: Universal Color Code Converter                                |
 +-----------------------------------------------------------------------+
 |                     +---------------------------+                     |
-|                     |  CENTERED CONTAINER       |                     |
-|                     |  Length: 16 characters    |                     |
-|                     |  [x] Symbols  [x] Numbers |                     |
+|                     |  UNIVERSAL INPUT BAR      |                     |
+|                     |  [ oklch(0.7 0.15 160)  ] |                     |
+|                     +---------------------------+                     |
+|                     |  [ COLOR SWATCH & SLIDERS]|                     |
 |                     |                           |                     |
-|                     |  RESULT:                  |                     |
-|                     |  [ k8#mP2$v9X!qL1zW  📋 ] |                     |
+|                     |  FORMATS:                 |                     |
+|                     |  HEX: #10B981             |                     |
+|                     |  RGB: rgb(16, 185, 129)   |                     |
+|                     |  HSL: hsl(160, 84%, 39%)  |                     |
 |                     |                           |                     |
-|                     |  [ GENERATE NEW ]         |                     |
+|                     |  [ WCAG: AAA PASS ]       |                     |
 |                     +---------------------------+                     |
 +-----------------------------------------------------------------------+
 ```
 
 ---
 
-## How to Implement This Cleanly in Code
+## How to Implement Layout Archetypes in Code
 
-To keep code clean and scalable, tools should consume the reusable **Layout Wrappers** located in `src/components/layouts/`:
-
-### Component Directory Structure
+All layout components live in `src/components/layouts/`:
 
 ```text
 src/components/
@@ -96,27 +107,4 @@ src/components/
     ├── split-pane-layout.tsx      # Archetype 1 (Transformation tools)
     ├── focus-canvas-layout.tsx    # Archetype 2 (Visual media & canvas tools)
     └── compact-card-layout.tsx    # Archetype 3 (Generators & calculators)
-```
-
-### Example Usage in a Tool Page (`src/app/tools/json-formatter/page.tsx`)
-
-```tsx
-import { SplitPaneLayout } from "@/components/layouts/split-pane-layout";
-
-export default function JsonFormatterPage() {
-  return (
-    <SplitPaneLayout
-      toolId="json-formatter"
-      title="JSON Formatter"
-      description="Prettify, validate, and minify JSON strings instantly."
-      category="dev"
-      icon="FileJson"
-      tags={["formatter", "validator"]}
-      leftPaneTitle="Input JSON"
-      rightPaneTitle="Formatted Output"
-      leftPane={<JsonInputEditor />}
-      rightPane={<JsonOutputViewer />}
-    />
-  );
-}
 ```

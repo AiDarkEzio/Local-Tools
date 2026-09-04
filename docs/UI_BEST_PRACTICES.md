@@ -2,7 +2,7 @@
 
 # 🚨 Critical Architectural Rules & Best Practices
 
-Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI and targets **React 19 / Next.js 16**, follow these rules to avoid TypeScript, React Compiler, and runtime errors.
+Because this project uses **Base UI** (`@base-ui/react`) instead of Radix UI and targets **React 19 / Next.js 16**, follow these rules to avoid TypeScript, React Compiler, hydration, and runtime errors.
 
 ---
 
@@ -156,7 +156,7 @@ Avoid hardcoding light/dark Tailwind utility pairs that apply the same property 
 
 ## ⛔ Rule 7: Always Use `grid-flow-dense` for Bento Grid Layouts
 
-When creating asymmetrical grid layouts with varying column/row spans (`2x2`, `2x1`, `1x2`), always include `grid-flow-dense` (`grid-auto-flow: dense`) on the grid container. This prevents empty gaps/holes caused by sequential item wrapping.
+When creating asymmetrical grid layouts with varying column/row spans (`2x2`, `2x1`, `1x2`), always include `grid-flow-dense` (`grid-auto-flow: dense`) on the grid container. This prevents empty gaps caused by sequential item wrapping.
 
 - 🟢 Correct
 
@@ -172,11 +172,11 @@ When creating asymmetrical grid layouts with varying column/row spans (`2x2`, `2
 
 ## ⛔ Rule 8: Synchronize Browser Stores (`localStorage`, URL Hashes) via `useSyncExternalStore` & Avoid Mutating Global Objects
 
-Do **not** read `localStorage` or `window.location.hash` inside `useEffect` and call `setState()`. Furthermore, do **not** directly mutate global browser objects like `window.location.hash = tab` inside event handlers, as this violates React 19 / React Compiler strict immutability rules (`react-hooks/immutability`).
+Do **not** read `localStorage` or `window.location.hash` inside `useEffect` and call `setState()`. Furthermore, do **not** directly mutate global browser objects like `window.location.hash = tab` inside event handlers, as this violates React 19 strict immutability rules.
 
 Instead, subscribe to external browser storage and location sources using `useSyncExternalStore`, and update browser URL state via `window.history.pushState`:
 
-### Example: Synchronizing URL Hash (`window.location.hash`)
+- 🟢 Correct
 
 ```typescript
 function subscribeHash(callback: () => void) {
@@ -209,68 +209,79 @@ const handleTabChange = (tab: CategoryFilterKey) => {
 
 ---
 
-## ⛔ Rule 9: Debounce Asynchronous Canvas & Media Computations (`canvas.toBlob`, OffscreenCanvas)
+## ⛔ Rule 9: Debounce Asynchronous Canvas & Media Computations
 
-When building tools that modify media in real-time (sliders for quality, dimensions, filters), running asynchronous `canvas.toBlob()` or `canvas.drawImage()` synchronously on every input tick causes:
-
-1. React Compiler `react-hooks/set-state-in-effect` errors.
-2. Race condition loops where `isProcessing` state gets stuck forever.
-3. Severe UI stutter and memory thrashing from rapid Object URL creations.
+When building tools that modify media in real-time (sliders for quality, dimensions, filters), running asynchronous `canvas.toBlob()` synchronously on every input tick causes UI stutter and memory thrashing.
 
 ### Best Practice Pattern
 
 1. **Cache decoded image in a `ref`:** Decode the uploaded `File` once into an `HTMLImageElement` stored in `cachedImgRef.current`.
-2. **Debounce the re-encoding effect (200–250ms):** Allow slider dragging to remain 60 FPS while postponing heavy canvas operations until dragging settles.
+2. **Debounce the re-encoding effect (200–250ms):** Postpone heavy canvas operations until dragging settles.
 3. **Use cancellation flags (`isActive = false`):** Ignore stale async callbacks when settings change mid-processing.
 4. **Revoke old Object URLs safely:** Clean up previous blob URLs whenever a new blob is produced.
 
-- 🟢 Correct Pattern (`src/app/(app)/tools/image-compressor/page.tsx`)
+---
+
+## ⛔ Rule 10: Client-Only Browser API Feature Detection via `useSyncExternalStore`
+
+Directly querying client-only browser capabilities (such as `window.EyeDropper`, `navigator.bluetooth`, or `window.serial`) inside JSX conditions causes **Hydration Failed** errors:
+
+- 🔴 Incorrect (Triggers SSR Hydration Mismatch)
 
 ```tsx
-React.useEffect(() => {
-  const img = cachedImgRef.current;
-  if (!img || targetWidth <= 0 || targetHeight <= 0) return;
+{typeof window !== "undefined" && "EyeDropper" in window && (
+  <Button onClick={handleEyeDropper}>Eyedropper</Button>
+)}
+```
 
-  let isActive = true;
+- 🟢 Correct Pattern (`useSyncExternalStore`)
 
-  // 200ms debounce prevents UI lockup during slider drags
-  const debounceTimer = setTimeout(() => {
-    setIsProcessing(true);
+```tsx
+const emptySubscribe = () => () => {};
 
-    const canvas = document.createElement("canvas");
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      setIsProcessing(false);
-      return;
-    }
+function getEyeDropperSnapshot(): boolean {
+  return typeof window !== "undefined" && "EyeDropper" in window;
+}
 
-    ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+function getEyeDropperServerSnapshot(): boolean {
+  return false;
+}
 
-    canvas.toBlob(
-      (blob) => {
-        if (!isActive || !blob) {
-          setIsProcessing(false);
-          return;
-        }
+// Inside Component:
+const hasEyeDropper = React.useSyncExternalStore(
+  emptySubscribe,
+  getEyeDropperSnapshot,
+  getEyeDropperServerSnapshot
+);
 
-        setCompressedBlob(blob);
-        setCompressedSize(blob.size);
-        setCompressedUrl((prev) => {
-          if (prev) URL.revokeObjectURL(prev);
-          return URL.createObjectURL(blob);
-        });
-        setIsProcessing(false);
-      },
-      format,
-      quality / 100
-    );
-  }, 200);
+return (
+  <>
+    {hasEyeDropper && (
+      <Button onClick={handleEyeDropper}>Eyedropper</Button>
+    )}
+  </>
+);
+```
 
-  return () => {
-    isActive = false;
-    clearTimeout(debounceTimer);
-  };
-}, [originalFile, targetWidth, targetHeight, format, quality]);
+---
+
+## ⛔ Rule 11: React 19 Script Injections & Theme Hydration Guards
+
+Theme providers (such as `next-themes`) inject inline `<script>` tags to manage `.dark` class attributes on `<html>` before hydration. In React 19, always add `suppressHydrationWarning` to both `<html>` and `<body>` tags in `src/app/layout.tsx` to prevent console script errors.
+
+- 🟢 Correct (`src/app/layout.tsx`)
+
+```tsx
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning className="...">
+      <body suppressHydrationWarning className="...">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
 ```

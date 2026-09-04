@@ -6,7 +6,7 @@
 **Project Type:** Open-Source Client-Side Utility Web Application  
 **Target Platform:** Web (Desktop & Mobile, Progressive Web App)  
 **Author:** @AiDarkEzio  
-**Status:** MVP Milestone Achieved (3 Reference Tools Live) / Phase 2 Active Expansion  
+**Status:** Phase 2 Milestone Achieved (8 Tools Live) / Phase 3 Preparation  
 **License:** MIT
 
 ---
@@ -30,9 +30,9 @@
 
 | Persona | Primary Needs | Key Tools Required |
 | :--- | :--- | :--- |
-| **Software Developers** | Quick, privacy-compliant dev helpers without ads or clutter. | JSON Formatter, Base64 Encoder/Decoder, Hash Generators, Regex Tester, Diff Checker |
-| **Content Creators / Designers** | Quick image adjustments without opening heavy software or uploading sensitive files. | Image Resizer/Cropper, SVG to PNG, Color Palette Picker, WEBP Converter |
-| **General Web Users** | Quick document or text fixes. | PDF Merger, Case Converter, Word/Character Counter, QR Code Generator |
+| **Software Developers** | Quick, privacy-compliant dev helpers without ads or clutter. | JSON Formatter, Base64 Encoder/Decoder, Hash Generators, Regex Tester, Diff Checker, Color Converter |
+| **Content Creators / Designers** | Quick image adjustments without opening heavy software or uploading sensitive files. | Image Resizer/Cropper, SVG to PNG, Color Converter, Color Palette Picker, WEBP Converter |
+| **General Web Users** | Quick document or text fixes. | PDF Merger, Case Converter, Word/Character Counter, Password Generator, QR Code Generator |
 
 ---
 
@@ -69,9 +69,14 @@
        │       └── compact-card-layout.tsx (Generators & Calculators)
        │
        ├──► Local Tool Components (Client Execution Only)
-       │       ├── JSON Formatter & Validator (Native JSON & Blob APIs)
+       │       ├── JSON Formatter & Validator (JSON.parse / JSON.stringify)
+       │       ├── Base64 Encoder / Decoder (btoa / atob / TextEncoder / TextDecoder)
+       │       ├── SHA & MD5 Hash Generator (Web Cryptography API / RFC 1321)
+       │       ├── Text Case Converter (Word Boundary Tokenizer & RegEx)
+       │       ├── Word & Text Analyzer (Typographic & Density Engine)
        │       ├── Image Compressor & Resizer (HTML5 Canvas & toBlob)
-       │       └── Secure Password Generator (Web Cryptography API)
+       │       ├── Secure Password Generator (Web Cryptography API CSPRNG)
+       │       └── Universal Color Code Converter (OKLCH / sRGB Math & EyeDropper API)
        │
        └──► LocalStorage & URL State Sync (Zero Server Persistence)
                ├── Favorites Array (`local-tools:favorites`)
@@ -103,9 +108,14 @@ Local-Tools/
 │   │   │   ├── layout.tsx    # App Shell (Navbar, Footer)
 │   │   │   ├── page.tsx      # Bento Grid Dashboard & Search
 │   │   │   └── tools/
-│   │   │       ├── json-formatter/page.tsx      # Archetype 1 Reference Tool
-│   │   │       ├── image-compressor/page.tsx    # Archetype 2 Reference Tool
-│   │   │       └── password-generator/page.tsx  # Archetype 3 Reference Tool
+│   │   │       ├── json-formatter/page.tsx      # Archetype 1 (Dev)
+│   │   │       ├── base64-encoder/page.tsx      # Archetype 1 (Dev)
+│   │   │       ├── hash-generator/page.tsx      # Archetype 1 (Security)
+│   │   │       ├── case-converter/page.tsx      # Archetype 1 (Text)
+│   │   │       ├── word-counter/page.tsx        # Archetype 1 (Text)
+│   │   │       ├── image-compressor/page.tsx    # Archetype 2 (Image)
+│   │   │       ├── password-generator/page.tsx  # Archetype 3 (Security)
+│   │   │       └── color-converter/page.tsx     # Archetype 3 (Image/Dev)
 │   │   ├── layout.tsx        # Root Providers & Fonts
 │   │   ├── globals.css       # Global Tailwind v4 OKLCH theme styles
 │   │   └── not-found.tsx     # 404 Error Stage
@@ -119,13 +129,14 @@ Local-Tools/
 │   ├── config/
 │   │   ├── categories.ts     # Centralized category config, labels & pastel theme tokens
 │   │   ├── tags.ts           # Strictly-typed ToolTag array
-│   │   └── tools.ts          # Metadata registry for all tools
+│   │   ├── tools.json        # Extended planned tool inventory
+│   │   └── tools.ts          # Master tool registry array
 │   ├── hooks/                # LocalStorage & Client state hooks
 │   │   ├── use-favorites.ts  # Persisted favorites toggle state
 │   │   └── use-recent-tools.ts# Persisted recent usage timestamp log
 │   ├── lib/                  # Shared helper functions (utils.ts)
 │   └── types/                # Storage & Data contracts (storage.ts)
-├── public/                   # Static assets & PWA manifest
+├── public/                   # Static assets & icons
 ├── next.config.ts            # Configured for static export (output: 'export')
 └── tsconfig.json
 ```
@@ -142,34 +153,37 @@ Local-Tools/
 * [x] Implement 3 standardized tool page layout archetypes (`components/layouts/*`).
 * [x] Configure static site export (`output: 'export'`) and GitHub Actions Pages workflow.
 
-### Phase 2: Lightweight Text & Developer Utilities `[IN PROGRESS]`
+### Phase 2: Lightweight Text & Developer Utilities `[COMPLETED]`
 
-* [x] **JSON Formatter & Validator:** Prettify, minify, validate syntax, sort object keys, upload/download JSON. *(Archetype 1 Reference Tool)*
-* [x] **Secure Password Generator:** Cryptographically secure passwords with entropy score & character controls. *(Archetype 3 Reference Tool)*
-* [ ] **Base64 Encoder / Decoder:** Text and file-to-Base64 conversion.
-* [ ] **Hash Generator:** Client-side MD5, SHA-1, SHA-256 generation using `crypto.subtle`.
-* [ ] **Word & Character Counter:** Real-time text analytics.
+* [x] **JSON Formatter & Validator:** Prettify, minify, validate syntax, sort object keys, upload/download JSON. *(Archetype 1)*
+* [x] **Secure Password Generator:** Cryptographically secure passwords with entropy score & character controls. *(Archetype 3)*
+* [x] **Base64 Encoder / Decoder:** UTF-8 Unicode text and binary file-to-Base64 conversion with URL-safe options. *(Archetype 1)*
+* [x] **Cryptographic Hash Generator:** Client-side MD5, SHA-1, SHA-256, SHA-384, SHA-512 generation and checksum comparison. *(Archetype 1)*
+* [x] **Text Case Converter:** 10 case convention transformations (camelCase, snake_case, PascalCase, kebab-case, CONSTANT_CASE). *(Archetype 1)*
+* [x] **Word & Text Analyzer:** Real-time word, character, sentence, line, reading time, and keyword density analytics. *(Archetype 1)*
+* [x] **Universal Color Code Converter:** Multi-format conversion (HEX, RGB, HSL, HSV, OKLCH, CMYK, CSS Names), WCAG contrast diagnostics, and EyeDropper. *(Archetype 3)*
 
 ### Phase 3: Canvas & Media Processing `[IN PROGRESS]`
 
-* [x] **Image Compressor & Resizer:** Debounced HTML5 Canvas re-encoding, WEBP/JPEG/PNG format conversion, aspect-ratio locked resizing, and live savings metrics. *(Archetype 2 Reference Tool)*
-* [ ] **SVG to PNG Converter:** Client-side vector rasterization.
-* [ ] **Color Picker & Palette Generator:** Canvas image color extractor.
+* [x] **Image Compressor & Resizer:** Debounced HTML5 Canvas re-encoding, WEBP/JPEG/PNG format conversion, aspect-ratio locked resizing, and live savings metrics. *(Archetype 2)*
+* [ ] **SVG to PNG Converter:** Client-side vector rasterization and format exporting.
+* [ ] **Color Palette Extractor:** Image dominant color extraction using canvas pixel analysis.
 
-### Phase 4: Advanced Utilities & Heavy Workers `[PLANNED]`
+### Phase 4: Advanced Utilities & Platform Infrastructure `[PLANNED]`
 
-* [ ] **PDF Merge / Split:** Powered by `pdf-lib` (client-side PDF binary manipulation).
-* [ ] **Text Diff Checker:** Inline comparison of text strings.
-* [ ] **PWA Implementation:** Enable offline caching via Service Workers.
+* [ ] **PDF Merge / Split / Extractor:** Powered by `pdf-lib` (pure client-side PDF binary manipulation).
+* [ ] **Text Diff Checker:** Side-by-side and inline line-by-line diff comparison.
+* [ ] **Progressive Web App (PWA) Implementation:** Offline asset caching via Service Workers and standalone install manifest.
 
 ---
 
 ## 6. Key Technical Benchmarks & Engineering Highlights
 
-1. **Strict Zero-Server Data Flow:** Verification that no `fetch` or `XHR` calls send user input payload out of the browser.
+1. **Strict Zero-Server Data Flow:** Verification that no `fetch` or `XHR` calls transmit user inputs, files, or generated keys out of the browser.
 2. **Debounced Canvas Execution:** Heavy image re-encoding tasks are debounced (~200ms) with in-memory image caching to maintain 60 FPS UI performance.
-3. **Web Cryptography API:** Native `window.crypto.getRandomValues` ensures true cryptographic randomness for security tools.
-4. **Deep-Link URL & State Synchronization:** Category filters sync bi-directionally with URL hash anchors (`useSyncExternalStore` + `history.pushState`).
+3. **Web Cryptography API:** Native `window.crypto.getRandomValues` and `window.crypto.subtle.digest` ensure cryptographic speed and true randomness.
+4. **Universal Color Engine:** Bi-directional mathematical conversion across sRGB, HSL, HSV, CMYK, and native Tailwind v4 OKLCH color spaces.
+5. **Deep-Link URL & External Store Synchronization:** Category filters and browser capabilities sync seamlessly without SSR hydration mismatches using `useSyncExternalStore`.
 
 ---
 
@@ -180,14 +194,14 @@ Local-Tools/
 | **Large Bundle Sizes:** Heavy libraries slowing down initial loads. | High | Use dynamic imports (`next/dynamic`) and native browser APIs wherever possible. |
 | **Canvas Slider Thrashing:** Un-debounced image re-encoding causing UI freeze or memory thrashing. | Medium | Cache decoded `HTMLImageElement` in memory and debounce `canvas.toBlob` execution by 200ms with cancellation flags. |
 | **Browser Memory Limits:** Heavy image processing freezing the UI tab. | Medium | Revoke previous Object URLs immediately upon generating new blobs (`URL.revokeObjectURL`). |
+| **Hydration Mismatches:** Client-only APIs like `EyeDropper` throwing SSR errors. | Low | Wrap capability queries in `useSyncExternalStore` with server snapshots returning `false`. |
 
 ---
 
-## 8. Definition of Done (MVP Milestone) `[ACHIEVED]`
+## 8. Definition of Done `[UPDATED]`
 
-* [x] Core project architecture and UI design system are established.
-* [x] Reusable tool layout archetypes (`SplitPaneLayout`, `FocusCanvasLayout`, `CompactCardLayout`) are built and integrated.
-* [x] At least **3 functional client-side tools** are implemented (JSON Formatter, Image Compressor, Password Generator).
-* [x] Universal Command-K search works across all registered tools.
-* [x] Static export passes without build errors and is deployed live via GitHub Pages.
-* [x] GitHub repository contains clear documentation, setup instructions, and open-source contribution guidelines.
+* [x] Core project architecture, design tokens, and UI layout archetypes established.
+* [x] **8 functional client-side tools** implemented and tested across multiple viewports and themes.
+* [x] Universal Command-K search and filter pills work across all registered tools.
+* [x] Static export passes without errors (`npm run build`) and deploys live via GitHub Pages.
+* [x] Documentation fully up to date with exact architectural guidelines and layout references.

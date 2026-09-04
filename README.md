@@ -10,9 +10,9 @@
 
 ## Project Status
 
-- **Version:** `v0.2.0`
-- **Stage:** [Phase 2 — Active Tool Expansion](./docs/DISCOVERY_PHASE.md#phase-2-lightweight-text--developer-utilities-fast-wins)
-- **Tools Count:** `3` (1 Functional Reference Tool per Standard Layout Archetype)
+- **Version:** `v0.3.0`
+- **Stage:** [Phase 2 Completed — Transitioning to Phase 3 Media Utilities](./docs/DISCOVERY_PHASE.md#phase-3-canvas--media-processing-in-progress)
+- **Tools Count:** `8` (Active utilities spanning all 3 standard layout archetypes)
 
 ---
 
@@ -21,8 +21,13 @@
 | Tool | Category | Layout Archetype | Description | Zero-Server Engine |
 | :--- | :--- | :--- | :--- | :--- |
 | [**JSON Formatter & Validator**](/tools/json-formatter) | `Developer` | **Split-Pane** (Archetype 1) | Prettify, validate, minify, and alphabetically sort JSON data with instant diagnostics. | `JSON.parse` / `JSON.stringify` |
+| [**Base64 Encoder / Decoder**](/tools/base64-encoder) | `Developer` | **Split-Pane** (Archetype 1) | Encode and decode text, emojis, and binary files with URL-safe formatting and size metrics. | `btoa` / `atob` / `TextEncoder` |
+| [**SHA & MD5 Hash Generator**](/tools/hash-generator) | `Security & Crypto` | **Split-Pane** (Archetype 1) | Generate MD5, SHA-1, SHA-256, and SHA-512 cryptographic digests with checksum validation. | `window.crypto.subtle` / RFC 1321 |
+| [**Text Case Converter**](/tools/case-converter) | `Text & Code` | **Split-Pane** (Archetype 1) | Transform text across camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, and Title Case. | Tokenizer & Regex Engine |
+| [**Word & Text Analyzer**](/tools/word-counter) | `Text & Code` | **Split-Pane** (Archetype 1) | Real-time word, character, and sentence counter with reading time and keyword frequency analysis. | Typography & Frequency Engine |
 | [**Image Compressor & Resizer**](/tools/image-compressor) | `Image & Media` | **Focus Canvas** (Archetype 2) | Compress, convert (WEBP, JPEG, PNG), and resize image dimensions with live size savings. | `HTMLCanvasElement` / `toBlob` |
 | [**Secure Password Generator**](/tools/password-generator) | `Security & Crypto` | **Compact Card** (Archetype 3) | Generate cryptographically secure passwords with entropy calculation and ambiguity filters. | `window.crypto.getRandomValues` |
+| [**Universal Color Code Converter**](/tools/color-converter) | `Image & Media` | **Compact Card** (Archetype 3) | Convert HEX, RGB, HSL, HSV, OKLCH, and CMYK colors with live sliders, contrast checking, and Eyedropper. | OKLCH / sRGB Math & EyeDropper API |
 
 ---
 

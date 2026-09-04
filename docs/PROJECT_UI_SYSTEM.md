@@ -26,17 +26,6 @@ This document serves as the single source of truth for the project's UI design s
 
 The project uses **Tailwind CSS v4** with **OKLCH color space** variables for high-perceptual accuracy dark and light themes.
 
-### CSS Imports & Dark Variant Definition
-
-```css
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-
-/* Custom dark mode variant matching the .dark class on <html> */
-@custom-variant dark (&:is(.dark *));
-```
-
 ### Inline Theme Mapping (`@theme inline`)
 
 ```css
@@ -92,61 +81,31 @@ The project uses **Tailwind CSS v4** with **OKLCH color space** variables for hi
 }
 ```
 
-### Color Variables Palette Table (OKLCH)
-
-| Variable | Light Theme (`:root`) | Dark Theme (`.dark`) |
-| :--- | :--- | :--- |
-| `--background` | `oklch(1 0 0)` (White) | `oklch(0.141 0.005 285.823)` (Dark Zinc) |
-| `--foreground` | `oklch(0.141 0.005 285.823)` | `oklch(0.985 0 0)` |
-| `--card` | `oklch(1 0 0)` | `oklch(0.21 0.006 285.885)` |
-| `--popover` | `oklch(1 0 0)` | `oklch(0.21 0.006 285.885)` |
-| `--primary` | `oklch(0.508 0.118 165.612)` (Emerald) | `oklch(0.432 0.095 166.913)` |
-| `--primary-foreground` | `oklch(0.979 0.021 166.113)` | `oklch(0.979 0.021 166.113)` |
-| `--secondary` | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` |
-| `--muted` | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` |
-| `--muted-foreground` | `oklch(0.552 0.016 285.938)` | `oklch(0.705 0.015 286.067)` |
-| `--border` | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 10%)` |
-| `--input` | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 15%)` |
-| `--ring` | `oklch(0.705 0.015 286.067)` | `oklch(0.552 0.016 285.938)` |
-| `--radius` | `0.625rem` (10px) | `0.625rem` (10px) |
-
 ---
 
-## 3. 🧩 Component & Data Catalog (`src/components/*`, `src/config/*`, `src/hooks/*`)
+## 3. 🧩 Component & Data Catalog
 
 ### Layout Components (`src/components/layouts/*`)
 
 1. **`ToolShell`** (`@/components/layouts/tool-shell`): Outer layout container providing responsive max-width bounds, padding, and ambient background glow.
 2. **`ToolHeader`** (`@/components/layouts/tool-header`): Unified header with breadcrumb navigation, category pastel badges, favorite star toggle (`useFavorites`), and automatic recent tool tracking (`useRecentTools`).
-3. **`SplitPaneLayout`** (`@/components/layouts/split-pane-layout`): Archetype 1 wrapper for data transformation and code/text processing tools.
+3. **`SplitPaneLayout`** (`@/components/layouts/split-pane-layout`): Archetype 1 wrapper for data transformation, hash computation, and text processing tools.
 4. **`FocusCanvasLayout`** (`@/components/layouts/focus-canvas-layout`): Archetype 2 wrapper for visual media, canvas editing, and file tools.
-5. **`CompactCardLayout`** (`@/components/layouts/compact-card-layout`): Archetype 3 wrapper for generators, calculators, and low-input utilities.
+5. **`CompactCardLayout`** (`@/components/layouts/compact-card-layout`): Archetype 3 wrapper for generators, calculators, and color code utilities.
 
-### UI Components (`src/components/ui/*`)
+### Active Tools Live Directory (`src/app/(app)/tools/*`)
 
-1. **`Button`** (`@/components/ui/button`): Base UI button engine supporting `default`, `outline`, `secondary`, `ghost`, `destructive`, `link` variants and custom sizes (`xs`, `sm`, `icon-xs`, `icon-sm`, etc.).
-2. **`Badge`** (`@/components/ui/badge`): Inline badge supporting `default`, `secondary`, `destructive`, `outline` variants.
-3. **`Card`** (`@/components/ui/card`): Structural card container with `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, and `CardFooter`.
-4. **`Tabs`** (`@/components/ui/tabs`): Tab panel navigation system built on Base UI tabs.
-5. **`Textarea`** (`@/components/ui/textarea`): Multi-line form input with auto-height and dark mode styling.
-6. **`InputGroup`** (`@/components/ui/input-group`): Flexible input container supporting addons, inline icons, and trigger buttons.
-7. **`DropdownMenu`** (`@/components/ui/dropdown-menu`): Menu popover built on `@base-ui/react/menu`.
-8. **`Command` & `CommandDialog`** (`@/components/ui/command`): Modal search menu powered by `cmdk`.
-9. **`Sonner` Toaster** (`@/components/ui/sonner`): Toast notification system integrated with `next-themes`.
-
-### Configuration & Data Layer (`src/config/*`)
-
-1. **`categories.ts`**: Single source of truth for tool categories, display labels, indicator dots, pill borders, and pastel badge styling (`CATEGORIES_MAP`, `ALL_FILTER_KEYS`, `getCategoryConfig`).
-2. **`tools.ts`**: Master tool registry array (`TOOLS`) containing tool metadata, categories, paths, grid span allocations, and tags.
-3. **`tags.ts`**: Strongly typed constant array (`KNOWN_TAGS`) restricting allowable tool tags.
-
-### Custom Application Hooks (`src/hooks/*`)
-
-1. **`useFavorites`**: Manages favorite tool IDs with `localStorage` persistence (`local-tools:favorites`) and `sonner` toast alerts.
-2. **`useRecentTools`**: Logs recently selected tool timestamps in `localStorage` (`local-tools:recent`).
+1. **`json-formatter/page.tsx`** — JSON Formatter, Syntax Validator & Minifier *(SplitPaneLayout)*
+2. **`base64-encoder/page.tsx`** — UTF-8 Base64 Text & File Encoder/Decoder *(SplitPaneLayout)*
+3. **`hash-generator/page.tsx`** — Web Crypto SHA & MD5 Checksum Generator *(SplitPaneLayout)*
+4. **`case-converter/page.tsx`** — Multi-Format Text Case Converter *(SplitPaneLayout)*
+5. **`word-counter/page.tsx`** — Typographic Word, Character & Readability Analyzer *(SplitPaneLayout)*
+6. **`image-compressor/page.tsx`** — Canvas Image Compressor, Resizer & Converter *(FocusCanvasLayout)*
+7. **`password-generator/page.tsx`** — CSPRNG Cryptographically Secure Password Generator *(CompactCardLayout)*
+8. **`color-converter/page.tsx`** — Universal Color Code Converter (HEX, RGB, HSL, OKLCH, CMYK) *(CompactCardLayout)*
 
 ---
 
-## 4. 🚨 Critical Architectural Rules & Best Practices
+## 4. 🚨 Critical Architectural Rules
 
-- Refer to [UI Best Practices Reference](./UI_BEST_PRACTICES.md) for detailed guidelines on Base UI composition, avoiding `asChild`, React 19 immutability rules, and state synchronization with `useSyncExternalStore`.
+Refer to [UI Best Practices Reference](./UI_BEST_PRACTICES.md) for detailed guidelines on Base UI composition, avoiding `asChild`, React 19 immutability rules, capability detection via `useSyncExternalStore`, and `suppressHydrationWarning` usage.
