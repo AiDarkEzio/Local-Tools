@@ -48,7 +48,7 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "Image",
     tags: ["compressor", "editor"],
     featured: true,
-    gridSpan: "1x1", // 1x2
+    gridSpan: "1x1",
     order: 2,
   },
   {
@@ -60,8 +60,20 @@ const ACTIVE_TOOLS: Tool[] = [
     icon: "KeyRound",
     tags: ["generator"],
     featured: true,
-    gridSpan: "1x1", // 2x1
+    gridSpan: "1x1",
     order: 3,
+  },
+  {
+    id: "case-converter",
+    name: "Text Case Converter",
+    description: "Transform text between camelCase, snake_case, PascalCase, and UPPERCASE.",
+    category: "text",
+    path: "/tools/case-converter",
+    icon: "Type",
+    tags: ["converter", "formatter"],
+    featured: false,
+    gridSpan: "1x1",
+    order: 6,
   },
 ];
 
