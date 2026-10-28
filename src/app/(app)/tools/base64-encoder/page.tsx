@@ -11,10 +11,10 @@ import {
   RotateCcw,
   Sparkles,
   Check,
-  Binary,
   ArrowRightLeft,
-  FileCode,
   Link2,
+  FileIcon,
+  X,
 } from "lucide-react";
 import { SplitPaneLayout } from "@/components/layouts/split-pane-layout";
 import { Button } from "@/components/ui/button";
@@ -25,19 +25,26 @@ const SAMPLE_TEXT = `Hello, Local-Tools! 🛠️
 Privacy-first developer utilities running 100% in your browser.
 Zero servers, zero tracking, zero latency.`;
 
-// Unicode & UTF-8 safe Base64 encoding
-function utf8ToBase64(str: string, urlSafe: boolean): string {
-  const bytes = new TextEncoder().encode(str);
+// Chunked conversion from raw Uint8Array to Base64 (avoids stack overflow)
+function uint8ArrayToBase64(bytes: Uint8Array, urlSafe: boolean): string {
   let binary = "";
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  const chunkSize = 8192;
+  const len = bytes.length;
+  for (let i = 0; i < len; i += chunkSize) {
+    const chunk = bytes.subarray(i, Math.min(i + chunkSize, len));
+    binary += String.fromCharCode.apply(null, Array.from(chunk));
   }
   let base64 = btoa(binary);
   if (urlSafe) {
     base64 = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
   return base64;
+}
+
+// Unicode & UTF-8 safe Base64 encoding for text strings
+function utf8ToBase64(str: string, urlSafe: boolean): string {
+  const bytes = new TextEncoder().encode(str);
+  return uint8ArrayToBase64(bytes, urlSafe);
 }
 
 // Unicode & UTF-8 safe Base64 decoding
@@ -57,9 +64,16 @@ function base64ToUtf8(str: string): string {
 function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ["B", "KB", "MB"];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+}
+
+interface BinaryFileInfo {
+  name: string;
+  size: number;
+  type: string;
+  rawBytes: Uint8Array;
 }
 
 export default function Base64EncoderPage() {
@@ -67,10 +81,35 @@ export default function Base64EncoderPage() {
   const [input, setInput] = React.useState(SAMPLE_TEXT);
   const [urlSafe, setUrlSafe] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
+  const [binaryFile, setBinaryFile] = React.useState<BinaryFileInfo | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Compute conversion result
   const { output, isValid, errorMessage, byteSize, inputByteSize } = React.useMemo(() => {
+    // Mode 1: Encode a binary file directly from raw bytes (bypasses TextEncoder!)
+    if (mode === "encode" && binaryFile) {
+      try {
+        const encoded = uint8ArrayToBase64(binaryFile.rawBytes, urlSafe);
+        return {
+          output: encoded,
+          isValid: true,
+          errorMessage: "",
+          byteSize: new Blob([encoded]).size,
+          inputByteSize: binaryFile.size,
+        };
+      } catch (err) {
+        const message = (err as Error).message || "Failed to encode binary file";
+        return {
+          output: `// ❌ Base64 Error:\n// ${message}`,
+          isValid: false,
+          errorMessage: message,
+          byteSize: 0,
+          inputByteSize: binaryFile.size,
+        };
+      }
+    }
+
+    // Mode 2: Normal string / text handling
     if (!input) {
       return { output: "", isValid: true, errorMessage: "", byteSize: 0, inputByteSize: 0 };
     }
@@ -107,7 +146,7 @@ export default function Base64EncoderPage() {
         inputByteSize: inSize,
       };
     }
-  }, [input, mode, urlSafe]);
+  }, [input, mode, urlSafe, binaryFile]);
 
   const handleCopy = () => {
     if (!output || !isValid) {
@@ -126,7 +165,12 @@ export default function Base64EncoderPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = mode === "encode" ? "encoded.b64.txt" : "decoded.txt";
+    link.download =
+      mode === "encode"
+        ? binaryFile
+          ? `${binaryFile.name}.b64.txt`
+          : "encoded.b64.txt"
+        : "decoded.txt";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -139,24 +183,50 @@ export default function Base64EncoderPage() {
     if (!file) return;
 
     if (mode === "encode") {
-      // Encode any binary/text file directly into Base64 Data URL
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        if (result) {
-          setInput(result);
-          toast.success(`Loaded "${file.name}" as Base64 Data URL (${formatBytes(file.size)})`);
-        }
-      };
-      reader.readAsDataURL(file);
+      const isTextFile =
+        file.type.startsWith("text/") ||
+        /\.(txt|json|md|csv|tsv|xml|html|css|js|ts|jsx|tsx|ya?ml|env|sql|sh)$/i.test(file.name);
+
+      if (isTextFile) {
+        setBinaryFile(null);
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result;
+          if (typeof result === "string") {
+            setInput(result);
+            toast.success(`Loaded text file "${file.name}" (${formatBytes(file.size)})`);
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        // Read arbitrary binary file (PNG, JPG, PDF, ZIP, etc.) as ArrayBuffer
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const buffer = event.target?.result as ArrayBuffer;
+          if (buffer) {
+            setInput("");
+            setBinaryFile({
+              name: file.name,
+              size: file.size,
+              type: file.type || "application/octet-stream",
+              rawBytes: new Uint8Array(buffer),
+            });
+            toast.success(`Encoded binary file "${file.name}" (${formatBytes(file.size)})`);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
     } else {
-      // Decode text file
+      // Decode mode: read base64 text file
+      setBinaryFile(null);
       const reader = new FileReader();
       reader.onload = (event) => {
-        const result = event.target?.result as string;
-        if (result) {
-          setInput(result);
-          toast.success(`Loaded "${file.name}" (${formatBytes(file.size)})`);
+        const result = event.target?.result;
+        if (typeof result === "string") {
+          // Remove potential data URL prefix if uploaded as data URL
+          const cleaned = result.replace(/^data:.*?;base64,/, "").trim();
+          setInput(cleaned);
+          toast.success(`Loaded Base64 file "${file.name}" (${formatBytes(file.size)})`);
         }
       };
       reader.readAsText(file);
@@ -164,12 +234,25 @@ export default function Base64EncoderPage() {
     e.target.value = "";
   };
 
+  const handleClear = () => {
+    setInput("");
+    setBinaryFile(null);
+  };
+
+  const handleReset = () => {
+    setInput("");
+    setBinaryFile(null);
+    setUrlSafe(false);
+  };
+
   const handleSwap = () => {
     if (isValid && output && !output.startsWith("// ❌")) {
       setInput(output);
+      setBinaryFile(null);
       setMode(mode === "encode" ? "decode" : "encode");
       toast.info(`Swapped to ${mode === "encode" ? "Decode" : "Encode"} mode`);
     } else {
+      setBinaryFile(null);
       setMode(mode === "encode" ? "decode" : "encode");
     }
   };
@@ -193,6 +276,7 @@ export default function Base64EncoderPage() {
             variant="outline"
             size="sm"
             onClick={() => {
+              setBinaryFile(null);
               setInput(SAMPLE_TEXT);
               setMode("encode");
               toast.success("Loaded sample text");
@@ -205,10 +289,7 @@ export default function Base64EncoderPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              setInput("");
-              setUrlSafe(false);
-            }}
+            onClick={handleReset}
             className="h-8 text-xs gap-1.5"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -224,7 +305,10 @@ export default function Base64EncoderPage() {
               <Button
                 variant={mode === "encode" ? "default" : "ghost"}
                 size="xs"
-                onClick={() => setMode("encode")}
+                onClick={() => {
+                  setBinaryFile(null);
+                  setMode("encode");
+                }}
                 className="h-6 px-2.5 text-xs font-mono font-medium"
               >
                 Encode Base64
@@ -232,7 +316,10 @@ export default function Base64EncoderPage() {
               <Button
                 variant={mode === "decode" ? "default" : "ghost"}
                 size="xs"
-                onClick={() => setMode("decode")}
+                onClick={() => {
+                  setBinaryFile(null);
+                  setMode("decode");
+                }}
                 className="h-6 px-2.5 text-xs font-mono font-medium"
               >
                 Decode Base64
@@ -267,7 +354,7 @@ export default function Base64EncoderPage() {
 
           {/* Diagnostics Badge */}
           <div className="flex items-center gap-2">
-            {input.trim() ? (
+            {binaryFile || input.trim() ? (
               <Badge
                 variant="outline"
                 className={
@@ -290,7 +377,13 @@ export default function Base64EncoderPage() {
           </div>
         </>
       }
-      leftPaneTitle={mode === "encode" ? "Plaintext / Binary Input" : "Base64 Input"}
+      leftPaneTitle={
+        mode === "encode"
+          ? binaryFile
+            ? "Binary File Input"
+            : "Plaintext Input"
+          : "Base64 Input"
+      }
       leftPaneActions={
         <div className="flex items-center gap-1">
           <input
@@ -311,8 +404,8 @@ export default function Base64EncoderPage() {
           <Button
             variant="ghost"
             size="xs"
-            onClick={() => setInput("")}
-            disabled={!input}
+            onClick={handleClear}
+            disabled={!input && !binaryFile}
             className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs gap-1"
           >
             <Trash2 className="w-3 h-3" />
@@ -322,19 +415,49 @@ export default function Base64EncoderPage() {
       }
       leftPane={
         <div className="flex flex-col flex-1 gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={
-              mode === "encode"
-                ? "Type or paste text to encode (supports UTF-8 / Emojis) or drop a file..."
-                : "Paste Base64 string to decode (e.g. SGVsbG8gV29ybGQ=)..."
-            }
-            spellCheck={false}
-            className="flex-1 font-mono text-xs leading-relaxed min-h-[380px] p-3 resize-none bg-background/50 border-border/60 focus:border-emerald-500 focus:ring-emerald-500/20"
-          />
+          {binaryFile && mode === "encode" ? (
+            <div className="flex-1 min-h-[380px] rounded-md border border-border/60 bg-background/50 p-4 flex flex-col items-center justify-center gap-3">
+              <div className="p-3 bg-muted rounded-full">
+                <FileIcon className="w-8 h-8 text-emerald-500" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-medium font-mono text-foreground break-all">
+                  {binaryFile.name}
+                </p>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {binaryFile.type || "binary"} &bull; {formatBytes(binaryFile.size)}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBinaryFile(null)}
+                className="mt-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3 h-3" />
+                Remove file & switch to text
+              </Button>
+            </div>
+          ) : (
+            <Textarea
+              value={input}
+              onChange={(e) => {
+                setBinaryFile(null);
+                setInput(e.target.value);
+              }}
+              placeholder={
+                mode === "encode"
+                  ? "Type or paste text to encode (supports UTF-8 / Emojis) or upload any file..."
+                  : "Paste Base64 string to decode (e.g. SGVsbG8gV29ybGQ=)..."
+              }
+              spellCheck={false}
+              className="flex-1 font-mono text-xs leading-relaxed min-h-[380px] p-3 resize-none bg-background/50 border-border/60 focus:border-emerald-500 focus:ring-emerald-500/20"
+            />
+          )}
           <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground px-1">
-            <span>Chars: {input.length}</span>
+            <span>
+              {binaryFile ? `Binary file loaded` : `Chars: ${input.length}`}
+            </span>
             <span>Size: {formatBytes(inputByteSize)}</span>
           </div>
         </div>
