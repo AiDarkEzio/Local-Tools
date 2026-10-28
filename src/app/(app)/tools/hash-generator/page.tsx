@@ -10,11 +10,10 @@ import {
   RotateCcw,
   Sparkles,
   Check,
-  ShieldCheck,
-  ShieldAlert,
   CheckCircle2,
   XCircle,
   FileText,
+  X,
 } from "lucide-react";
 import { SplitPaneLayout } from "@/components/layouts/split-pane-layout";
 import { Button } from "@/components/ui/button";
@@ -126,14 +125,29 @@ async function computeWebCryptoHash(algorithm: string, data: Uint8Array): Promis
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
 interface HashRow {
   name: string;
   bits: number;
   value: string;
 }
 
+interface LoadedFile {
+  name: string;
+  size: number;
+  data: Uint8Array;
+}
+
 export default function HashGeneratorPage() {
-  const [input, setInput] = React.useState(SAMPLE_TEXT);
+  const [inputText, setInputText] = React.useState(SAMPLE_TEXT);
+  const [fileData, setFileData] = React.useState<LoadedFile | null>(null);
   const [uppercase, setUppercase] = React.useState(false);
   const [compareHash, setCompareHash] = React.useState("");
   const [copiedKey, setCopiedKey] = React.useState<string | null>(null);
@@ -142,18 +156,25 @@ export default function HashGeneratorPage() {
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Compute all hashes on input change
+  // Compute all hashes whenever text or loaded binary file changes
   React.useEffect(() => {
     let isActive = true;
 
     async function generateAllHashes() {
-      if (!input) {
+      let data: Uint8Array | null = null;
+
+      if (fileData) {
+        data = fileData.data;
+      } else if (inputText) {
+        data = new TextEncoder().encode(inputText);
+      }
+
+      if (!data || data.length === 0) {
         setHashes([]);
         return;
       }
 
       setIsCalculating(true);
-      const data = new TextEncoder().encode(input);
 
       try {
         const md5Val = md5(data);
@@ -176,7 +197,9 @@ export default function HashGeneratorPage() {
         }
       } catch (err) {
         console.error("Hash calculation failed", err);
-        setIsCalculating(false);
+        if (isActive) {
+          setIsCalculating(false);
+        }
       }
     }
 
@@ -185,7 +208,7 @@ export default function HashGeneratorPage() {
     return () => {
       isActive = false;
     };
-  }, [input]);
+  }, [inputText, fileData]);
 
   const handleCopy = (val: string, key: string) => {
     const formatted = uppercase ? val.toUpperCase() : val.toLowerCase();
@@ -201,12 +224,23 @@ export default function HashGeneratorPage() {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const content = event.target?.result as string;
-      setInput(content);
+      const arrayBuffer = event.target?.result as ArrayBuffer;
+      if (!arrayBuffer) return;
+
+      setFileData({
+        name: file.name,
+        size: file.size,
+        data: new Uint8Array(arrayBuffer),
+      });
       toast.success(`Loaded "${file.name}" for checksum hashing`);
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
     e.target.value = "";
+  };
+
+  const handleClear = () => {
+    setInputText("");
+    setFileData(null);
   };
 
   // Compare mode match status
@@ -216,6 +250,8 @@ export default function HashGeneratorPage() {
     const matched = hashes.find((h) => h.value.toLowerCase() === target);
     return matched ? matched.name : "none";
   }, [compareHash, hashes]);
+
+  const hasContent = fileData !== null || inputText.length > 0;
 
   return (
     <SplitPaneLayout
@@ -231,7 +267,8 @@ export default function HashGeneratorPage() {
             variant="outline"
             size="sm"
             onClick={() => {
-              setInput(SAMPLE_TEXT);
+              setFileData(null);
+              setInputText(SAMPLE_TEXT);
               setCompareHash("");
               toast.success("Loaded sample text");
             }}
@@ -244,7 +281,7 @@ export default function HashGeneratorPage() {
             variant="outline"
             size="sm"
             onClick={() => {
-              setInput("");
+              handleClear();
               setCompareHash("");
             }}
             className="h-8 text-xs gap-1.5"
@@ -277,7 +314,7 @@ export default function HashGeneratorPage() {
           </div>
         </>
       }
-      leftPaneTitle="Input Text or Data"
+      leftPaneTitle={fileData ? "Input File" : "Input Text"}
       leftPaneActions={
         <div className="flex items-center gap-1">
           <input
@@ -298,8 +335,8 @@ export default function HashGeneratorPage() {
           <Button
             variant="ghost"
             size="xs"
-            onClick={() => setInput("")}
-            disabled={!input}
+            onClick={handleClear}
+            disabled={!hasContent}
             className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs gap-1"
           >
             <Trash2 className="w-3 h-3" />
@@ -309,13 +346,40 @@ export default function HashGeneratorPage() {
       }
       leftPane={
         <div className="flex flex-col flex-1 gap-3">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type or paste text string to compute hashes in real-time..."
-            spellCheck={false}
-            className="flex-1 font-mono text-xs leading-relaxed min-h-[260px] p-3 resize-none bg-background/50 border-border/60 focus:border-emerald-500 focus:ring-emerald-500/20"
-          />
+          {fileData ? (
+            <div className="flex-1 flex flex-col justify-center items-center p-6 border border-dashed rounded-md border-border/80 bg-muted/10 gap-3">
+              <div className="p-3 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                <FileText className="w-8 h-8 text-emerald-500" />
+              </div>
+              <div className="text-center space-y-1">
+                <div className="font-mono text-sm font-semibold break-all text-foreground max-w-sm">
+                  {fileData.name}
+                </div>
+                <div className="text-xs text-muted-foreground font-mono">
+                  {formatBytes(fileData.size)}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFileData(null)}
+                className="mt-2 text-xs gap-1 h-7 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+                Remove File & Use Text
+              </Button>
+            </div>
+          ) : (
+            <Textarea
+              value={inputText}
+              onChange={(e) => {
+                setInputText(e.target.value);
+              }}
+              placeholder="Type or paste text string to compute hashes in real-time, or upload a file..."
+              spellCheck={false}
+              className="flex-1 font-mono text-xs leading-relaxed min-h-[260px] p-3 resize-none bg-background/50 border-border/60 focus:border-emerald-500 focus:ring-emerald-500/20"
+            />
+          )}
 
           {/* Checksum Matcher Input */}
           <div className="pt-2 border-t border-border/40 flex flex-col gap-1.5">
@@ -399,7 +463,7 @@ export default function HashGeneratorPage() {
             })
           ) : (
             <div className="flex items-center justify-center flex-1 text-muted-foreground/60 italic text-xs">
-              Type or paste input to compute cryptographic digests...
+              Type or paste input, or upload a file to compute cryptographic digests...
             </div>
           )}
         </div>
