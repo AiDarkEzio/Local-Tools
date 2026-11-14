@@ -15,7 +15,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Local Tools — Fast, Private Browser Utilities",
+  title: {
+    template: "%s — Local Tools",
+    default: "Local Tools — Fast, Private Browser Utilities",
+  },
   description: "Collection of fast developer and everyday web utilities that run 100% locally in your browser. Zero server uploads.",
 };
 
