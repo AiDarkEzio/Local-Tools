@@ -11,7 +11,7 @@
 ## Project Status
 
 - **Version:** `v0.3.0`
-- **Stage:** [Phase 2 Completed — Transitioning to Phase 3 Media Utilities](./docs/DISCOVERY_PHASE.md#phase-3-canvas--media-processing-in-progress)
+- **Stage:** [Phase 2 Completed & Hardened — Transitioning to Phase 3 Media Utilities](./docs/DISCOVERY_PHASE.md#phase-3-canvas--media-processing-in-progress)
 - **Tools Count:** `8` (Active utilities spanning all 3 standard layout archetypes)
 
 ---
@@ -36,7 +36,7 @@
 - 🔒 **100% Client-Side Execution:** Your data, images, code, and credentials never touch a remote server.
 - ⚡ **Zero-Latency Performance:** Instant calculations running directly on your device using native browser APIs.
 - 🎨 **Modern Minimalist UI:** Built with Next.js 16 (App Router), Tailwind CSS v4, Base UI primitives, and dual Dark/Light mode support.
-- 📱 **Responsive Bento Discovery:** Dynamic grid layout with universal `Cmd + K` search, category filter pills, and URL hash synchronization.
+- 📱 **Responsive Discovery & Static SEO:** Dynamic grid layout with universal `Cmd + K` search, category filter pills, URL hash sync, and per-route static SEO metadata (`trailingSlash: true` for GitHub Pages).
 
 ---
 
@@ -81,6 +81,7 @@ The static HTML/CSS/JS export will be generated in the `./out` directory, ready 
 - [The 3 Tool Layout Archetypes](./docs/TOOL_LAYOUT_ARCHETYPES.md)
 - [Base UI & React 19 Best Practices](./docs/UI_BEST_PRACTICES.md)
 - [Basecn Registry Reference](./docs/BASECN.md)
+- [Planned Tools Backlog](./docs/tools-backlog.json)
 
 ---
 

@@ -285,3 +285,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+
+---
+
+## ⛔ Rule 12: Export Static SEO Metadata via Route `layout.tsx` (Keep Tool Pages `"use client"`)
+
+In Next.js App Router with static exports (`output: 'export'`), files marked `"use client"` cannot export a `metadata` object or `generateMetadata`.
+
+Do **not** leave tool routes without metadata (which causes every tool to inherit the generic root title), and avoid unnecessarily splitting simple tool pages into separate wrapper files when a route `layout.tsx` suffices. Instead, pair each client `page.tsx` with a Server Component `layout.tsx` using `createToolMetadata` from `@/lib/metadata`:
+
+- 🔴 Incorrect (Exporting metadata inside `"use client"` throws a Next.js build error)
+
+```tsx
+"use client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "JSON Formatter" }; // Build error!
+```
+
+- 🟢 Correct (`src/app/(app)/tools/json-formatter/layout.tsx`)
+
+```tsx
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import { createToolMetadata } from "@/lib/metadata";
+
+export const metadata: Metadata = createToolMetadata("json-formatter", [
+  "json formatter",
+  "json validator",
+]);
+
+export default function JsonFormatterLayout({ children }: { children: ReactNode }) {
+  return children;
+}
+```
