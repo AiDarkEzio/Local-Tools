@@ -6,7 +6,7 @@
 **Project Type:** Open-Source Client-Side Utility Web Application  
 **Target Platform:** Web (Desktop & Mobile, Progressive Web App)  
 **Author:** @AiDarkEzio  
-**Status:** Phase 2 Milestone Achieved (8 Tools Live) / Phase 3 Preparation  
+**Status:** Phase 2 Milestone & Clean-Up Completed (8 Tools Live) / Phase 3 Preparation  
 **License:** MIT
 
 ---
@@ -42,7 +42,7 @@
 
 | Layer | Selected Technology | Technical Justification |
 | :--- | :--- | :--- |
-| **Framework** | **Next.js (App Router)** | Static export capabilities (`output: 'export'`), file-based routing, SEO routing, and strong TypeScript integration. |
+| **Framework** | **Next.js (App Router)** | Static export capabilities (`output: 'export'`, `trailingSlash: true`), file-based routing, per-route SEO metadata, and strong TypeScript integration. |
 | **Language** | **TypeScript** | Enforces strict type safety, prevents runtime errors, and demonstrates enterprise-level code quality. |
 | **Styling** | **Tailwind CSS v4** | Utility-first styling for high productivity, minimal bundle size, OKLCH colors, and native dark mode support. |
 | **Component System** | **Shadcn UI + Base UI** | Accessible, custom-styled UI primitives built directly into the repository without vendor lock-in. |
@@ -55,7 +55,7 @@
 ```text
 [ Browser / Client ]
        │
-       ├──► Next.js Static Bundle (HTML / CSS / TSX)
+       ├──► Next.js Static Bundle (HTML / CSS / TSX + Per-Route SEO Metadata)
        │
        ├──► Central Category Registry (config/categories.ts)
        │       └── Pastel Color Tokens, Dot Indicators & Filter Maps
@@ -95,30 +95,31 @@ To keep the application maintainable as new tools are added, `Local-Tools` uses 
 ```text
 Local-Tools/
 ├── .github/                  # CI/CD workflows (GitHub Actions)
-├── docs/                     # Architecture & Discovery docs
+├── docs/                     # Architecture, Discovery & Backlog docs
 │   ├── BASECN.md
 │   ├── DESIGN_SYSTEM_SPEC.md
 │   ├── DISCOVERY_PHASE.md
 │   ├── PROJECT_UI_SYSTEM.md
 │   ├── TOOL_LAYOUT_ARCHETYPES.md
-│   └── UI_BEST_PRACTICES.md
+│   ├── UI_BEST_PRACTICES.md
+│   └── tools-backlog.json    # Extended planned tool inventory (24 upcoming tools)
 ├── src/
 │   ├── app/                  # Next.js App Router (SSG Pages)
 │   │   ├── (app)/
 │   │   │   ├── layout.tsx    # App Shell (Navbar, Footer)
 │   │   │   ├── page.tsx      # Bento Grid Dashboard & Search
-│   │   │   └── tools/
-│   │   │       ├── json-formatter/page.tsx      # Archetype 1 (Dev)
-│   │   │       ├── base64-encoder/page.tsx      # Archetype 1 (Dev)
-│   │   │       ├── hash-generator/page.tsx      # Archetype 1 (Security)
-│   │   │       ├── case-converter/page.tsx      # Archetype 1 (Text)
-│   │   │       ├── word-counter/page.tsx        # Archetype 1 (Text)
-│   │   │       ├── image-compressor/page.tsx    # Archetype 2 (Image)
-│   │   │       ├── password-generator/page.tsx  # Archetype 3 (Security)
-│   │   │       └── color-converter/page.tsx     # Archetype 3 (Image/Dev)
-│   │   ├── layout.tsx        # Root Providers & Fonts
+│   │   │   └── tools/        # Each tool pairs layout.tsx (SEO metadata) + page.tsx (Client UI)
+│   │   │       ├── json-formatter/     # Archetype 1 (Dev)
+│   │   │       ├── base64-encoder/     # Archetype 1 (Dev)
+│   │   │       ├── hash-generator/     # Archetype 1 (Security)
+│   │   │       ├── case-converter/     # Archetype 1 (Text)
+│   │   │       ├── word-counter/       # Archetype 1 (Text)
+│   │   │       ├── image-compressor/   # Archetype 2 (Image)
+│   │   │       ├── password-generator/ # Archetype 3 (Security)
+│   │   │       └── color-converter/    # Archetype 3 (Image/Dev)
+│   │   ├── layout.tsx        # Root Providers, Fonts & Metadata Title Template
 │   │   ├── globals.css       # Global Tailwind v4 OKLCH theme styles
-│   │   └── not-found.tsx     # 404 Error Stage
+│   │   └── not-found.tsx     # Semantic Token 404 Error Stage
 │   ├── components/
 │   │   ├── home/             # Homepage components (tool-card.tsx)
 │   │   ├── icons/            # Brand & Tool SVG components (logo-icon.tsx, tool-icon.tsx, github-icon.tsx)
@@ -129,15 +130,16 @@ Local-Tools/
 │   ├── config/
 │   │   ├── categories.ts     # Centralized category config, labels & pastel theme tokens
 │   │   ├── tags.ts           # Strictly-typed ToolTag array
-│   │   ├── tools.json        # Extended planned tool inventory
-│   │   └── tools.ts          # Master tool registry array
+│   │   └── tools.ts          # Single-source master tool registry (TOOLS + getToolById)
 │   ├── hooks/                # LocalStorage & Client state hooks
 │   │   ├── use-favorites.ts  # Persisted favorites toggle state
 │   │   └── use-recent-tools.ts# Persisted recent usage timestamp log
-│   ├── lib/                  # Shared helper functions (utils.ts)
+│   ├── lib/
+│   │   ├── metadata.ts       # Static per-tool SEO metadata generator (createToolMetadata)
+│   │   └── utils.ts          # Shared class merging & utility helpers
 │   └── types/                # Storage & Data contracts (storage.ts)
 ├── public/                   # Static assets & icons
-├── next.config.ts            # Configured for static export (output: 'export')
+├── next.config.ts            # Configured for static export (output: 'export', trailingSlash: true)
 └── tsconfig.json
 ```
 
@@ -162,6 +164,7 @@ Local-Tools/
 * [x] **Text Case Converter:** 10 case convention transformations (camelCase, snake_case, PascalCase, kebab-case, CONSTANT_CASE). *(Archetype 1)*
 * [x] **Word & Text Analyzer:** Real-time word, character, sentence, line, reading time, and keyword density analytics. *(Archetype 1)*
 * [x] **Universal Color Code Converter:** Multi-format conversion (HEX, RGB, HSL, HSV, OKLCH, CMYK, CSS Names), WCAG contrast diagnostics, and EyeDropper. *(Archetype 3)*
+* [x] **Phase 2 Clean-Up & Hardening:** Per-tool static SEO metadata (`layout.tsx` + `src/lib/metadata.ts`), semantic OKLCH `not-found.tsx`, `trailingSlash: true` static routing, and single-source `tools.ts` registry consolidation.
 
 ### Phase 3: Canvas & Media Processing `[IN PROGRESS]`
 
@@ -173,6 +176,7 @@ Local-Tools/
 
 * [ ] **PDF Merge / Split / Extractor:** Powered by `pdf-lib` (pure client-side PDF binary manipulation).
 * [ ] **Text Diff Checker:** Side-by-side and inline line-by-line diff comparison.
+* [ ] **Web Worker Pool & Test Suite:** Offload heavy hashing/canvas processing to Web Workers and cover pure engines with Vitest unit tests.
 * [ ] **Progressive Web App (PWA) Implementation:** Offline asset caching via Service Workers and standalone install manifest.
 
 ---
@@ -183,7 +187,7 @@ Local-Tools/
 2. **Debounced Canvas Execution:** Heavy image re-encoding tasks are debounced (~200ms) with in-memory image caching to maintain 60 FPS UI performance.
 3. **Web Cryptography API:** Native `window.crypto.getRandomValues` and `window.crypto.subtle.digest` ensure cryptographic speed and true randomness.
 4. **Universal Color Engine:** Bi-directional mathematical conversion across sRGB, HSL, HSV, CMYK, and native Tailwind v4 OKLCH color spaces.
-5. **Deep-Link URL & External Store Synchronization:** Category filters and browser capabilities sync seamlessly without SSR hydration mismatches using `useSyncExternalStore`.
+5. **Deep-Link URL & External Store Synchronization:** Category filters and browser capabilities sync seamlessly without SSR hydration mismatches using `useSyncExternalStore`, while `trailingSlash: true` and route-level `layout.tsx` wrappers ensure reliable static GitHub Pages routing and per-tool SEO metadata.
 
 ---
 
@@ -195,6 +199,7 @@ Local-Tools/
 | **Canvas Slider Thrashing:** Un-debounced image re-encoding causing UI freeze or memory thrashing. | Medium | Cache decoded `HTMLImageElement` in memory and debounce `canvas.toBlob` execution by 200ms with cancellation flags. |
 | **Browser Memory Limits:** Heavy image processing freezing the UI tab. | Medium | Revoke previous Object URLs immediately upon generating new blobs (`URL.revokeObjectURL`). |
 | **Hydration Mismatches:** Client-only APIs like `EyeDropper` throwing SSR errors. | Low | Wrap capability queries in `useSyncExternalStore` with server snapshots returning `false`. |
+| **Static Hosting Deep-Link 404s:** Bare `.html` files failing on static host route refreshes. | Low | Configure `trailingSlash: true` in `next.config.ts` so every route exports as `/route/index.html`. |
 
 ---
 
@@ -202,6 +207,7 @@ Local-Tools/
 
 * [x] Core project architecture, design tokens, and UI layout archetypes established.
 * [x] **8 functional client-side tools** implemented and tested across multiple viewports and themes.
+* [x] Per-tool static SEO metadata, semantic 404 stage, `trailingSlash` routing, and single-source `tools.ts` registry completed.
 * [x] Universal Command-K search and filter pills work across all registered tools.
 * [x] Static export passes without errors (`npm run build`) and deploys live via GitHub Pages.
 * [x] Documentation fully up to date with exact architectural guidelines and layout references.
