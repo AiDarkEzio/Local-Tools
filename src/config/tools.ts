@@ -2,7 +2,6 @@
 
 import { ToolTag } from "./tags";
 import { ToolCategory } from "./categories";
-// import rawTools from "./tools.json";
 
 export type { ToolCategory };
 
@@ -14,7 +13,7 @@ export interface Tool {
   description: string; // Short SEO summary
   category: ToolCategory;
   path: string;        // Route path (e.g., '/tools/json-formatter')
-  icon: string;        // Lucide icon key (e.g., Image / FileText)
+  icon: string;        // Lucide icon key (e.g., 'FileJson', 'Image')
   tags: ToolTag[];     // Strictly typed tags from KNOWN_TAGS
 
   // Visual & Feature Indicators
@@ -26,7 +25,7 @@ export interface Tool {
   order?: number;      // Custom display priority (lower numbers rank higher)
 }
 
-const ACTIVE_TOOLS: Tool[] = [
+export const TOOLS: Tool[] = [
   {
     id: "json-formatter",
     name: "JSON Formatter & Validator",
@@ -125,10 +124,6 @@ const ACTIVE_TOOLS: Tool[] = [
   },
 ];
 
-// const activeIds = new Set(ACTIVE_TOOLS.map((t) => t.id));
-
-// Filter out duplicates from rawTools and place active tools first
-export const TOOLS: Tool[] = [
-  ...ACTIVE_TOOLS,
-  // ...(rawTools as Tool[]).filter((t) => !activeIds.has(t.id)),
-];
+export function getToolById(id: string): Tool | undefined {
+  return TOOLS.find((tool) => tool.id === id);
+}

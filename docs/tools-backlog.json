@@ -1,0 +1,232 @@
+[
+  {
+    "id": "jwt-decoder",
+    "name": "JWT Token Inspector",
+    "description": "Decode and inspect JSON Web Tokens headers and payload without revealing secret keys.",
+    "category": "dev",
+    "path": "/tools/jwt-decoder",
+    "icon": "Code2",
+    "tags": ["parser", "viewer"],
+    "gridSpan": "2x1"
+  },
+  {
+    "id": "regex-tester",
+    "name": "Regex Pattern Matcher",
+    "description": "Test and debug Regular Expressions in real-time with pattern highlighting.",
+    "category": "dev",
+    "path": "/tools/regex-tester",
+    "icon": "FileCode",
+    "tags": ["checker", "validator"]
+  },
+  {
+    "id": "text-diff-checker",
+    "name": "Text & Code Diff Checker",
+    "description": "Compare two blocks of code or text line-by-line to find differences.",
+    "category": "text",
+    "path": "/tools/text-diff-checker",
+    "icon": "GitCompare",
+    "tags": ["checker", "editor"],
+    "featured": true,
+    "gridSpan": "2x1"
+  },
+  {
+    "id": "markdown-previewer",
+    "name": "Markdown Live Editor",
+    "description": "Write and preview Markdown documents with live GitHub-flavored styling.",
+    "category": "text",
+    "path": "/tools/markdown-previewer",
+    "icon": "AlignLeft",
+    "tags": ["editor", "viewer"]
+  },
+  {
+    "id": "image-resizer",
+    "name": "Image Dimensions Resizer",
+    "description": "Resize single or batch images to exact pixel dimensions or percentages.",
+    "category": "image",
+    "path": "/tools/image-resizer",
+    "icon": "Scaling",
+    "tags": ["editor", "converter"],
+    "gridSpan": "1x2"
+  },
+  {
+    "id": "color-palette-extractor",
+    "name": "Color Palette Picker",
+    "description": "Extract dominant color palettes and HEX codes from uploaded images.",
+    "category": "image",
+    "path": "/tools/color-palette-extractor",
+    "icon": "Palette",
+    "tags": ["generator", "viewer"]
+  },
+  {
+    "id": "svg-to-png",
+    "name": "SVG Vector Converter",
+    "description": "Convert scalable SVG graphics into rasterized PNG or WEBP formats.",
+    "category": "image",
+    "path": "/tools/svg-to-png",
+    "icon": "Pipette",
+    "tags": ["converter", "editor"]
+  },
+  {
+    "id": "audio-trimmer",
+    "name": "Browser Audio Trimmer",
+    "description": "Cut and trim MP3 and WAV audio clips directly inside your browser.",
+    "category": "video-audio",
+    "path": "/tools/audio-trimmer",
+    "icon": "Scissors",
+    "tags": ["editor"],
+    "isNew": true
+  },
+  {
+    "id": "video-gif-converter",
+    "name": "Video to GIF Converter",
+    "description": "Convert short MP4 or WebM video clips into animated GIF files.",
+    "category": "video-audio",
+    "path": "/tools/video-gif-converter",
+    "icon": "Film",
+    "tags": ["converter", "compressor"],
+    "gridSpan": "2x1"
+  },
+  {
+    "id": "pdf-merger",
+    "name": "PDF Page Merger",
+    "description": "Combine multiple PDF documents into a single organized file.",
+    "category": "document",
+    "path": "/tools/pdf-merger",
+    "icon": "FileSpreadsheet",
+    "tags": ["pdf", "editor"],
+    "featured": true,
+    "gridSpan": "1x2"
+  },
+  {
+    "id": "pdf-page-remover",
+    "name": "PDF Page Extractor",
+    "description": "Delete or extract specific page numbers from PDF files locally.",
+    "category": "document",
+    "path": "/tools/pdf-page-remover",
+    "icon": "FileText",
+    "tags": ["pdf", "editor"]
+  },
+  {
+    "id": "encryption-decryption",
+    "name": "AES Text Encryption Tool",
+    "description": "Encrypt and decrypt secret messages using AES-256 GCM encryption keys.",
+    "category": "security",
+    "path": "/tools/encryption-decryption",
+    "icon": "ShieldAlert",
+    "tags": ["encoder-decoder"]
+  },
+  {
+    "id": "loan-calculator",
+    "name": "EMI & Loan Calculator",
+    "description": "Calculate monthly installments, interest rates, and loan payment schedules.",
+    "category": "math-finance",
+    "path": "/tools/loan-calculator",
+    "icon": "Landmark",
+    "tags": ["calculator"]
+  },
+  {
+    "id": "percentage-calculator",
+    "name": "Percentage Increase Calculator",
+    "description": "Compute percentage differences, discounts, and margin calculations.",
+    "category": "math-finance",
+    "path": "/tools/percentage-calculator",
+    "icon": "Percent",
+    "tags": ["calculator"]
+  },
+  {
+    "id": "chart-data-generator",
+    "name": "Quick Chart Visualizer",
+    "description": "Turn CSV or table data into downloadable bar, line, and pie charts.",
+    "category": "math-finance",
+    "path": "/tools/chart-data-generator",
+    "icon": "BarChart3",
+    "tags": ["generator", "viewer"]
+  },
+  {
+    "id": "unix-timestamp-converter",
+    "name": "Unix Epoch Timestamp Tool",
+    "description": "Convert human-readable dates to Unix timestamps and vice versa.",
+    "category": "time",
+    "path": "/tools/unix-timestamp-converter",
+    "icon": "Clock",
+    "tags": ["converter", "calculator"]
+  },
+  {
+    "id": "cron-expression-parser",
+    "name": "Cron Schedule Expression Parser",
+    "description": "Parse and understand cron job schedules with upcoming execution times.",
+    "category": "time",
+    "path": "/tools/cron-expression-parser",
+    "icon": "CalendarClock",
+    "tags": ["parser", "checker"],
+    "isNew": true,
+    "gridSpan": "2x1"
+  },
+  {
+    "id": "timezone-converter",
+    "name": "World Clock Timezone Sync",
+    "description": "Compare and convert times across global timezones.",
+    "category": "time",
+    "path": "/tools/timezone-converter",
+    "icon": "Globe2",
+    "tags": ["converter"]
+  },
+  {
+    "id": "uuid-v4-generator",
+    "name": "UUID / GUID Generator",
+    "description": "Generate single or bulk random v4 UUID identifiers.",
+    "category": "generators",
+    "path": "/tools/uuid-v4-generator",
+    "icon": "Fingerprint",
+    "tags": ["generator"],
+    "gridSpan": "2x1"
+  },
+  {
+    "id": "qr-code-generator",
+    "name": "Custom QR Code Generator",
+    "description": "Create vector SVG or PNG QR codes for URLs, WiFi credentials, and contact cards.",
+    "category": "generators",
+    "path": "/tools/qr-code-generator",
+    "icon": "QrCode",
+    "tags": ["generator", "viewer"],
+    "gridSpan": "1x2"
+  },
+  {
+    "id": "data-unit-converter",
+    "name": "Byte & Data Storage Converter",
+    "description": "Convert between Bytes, Kilobytes, Megabytes, Gigabytes, and Terabytes.",
+    "category": "unit-converter",
+    "path": "/tools/data-unit-converter",
+    "icon": "HardDrive",
+    "tags": ["unit", "converter"]
+  },
+  {
+    "id": "length-unit-converter",
+    "name": "Metric & Imperial Unit Converter",
+    "description": "Convert measurements between meters, feet, inches, kilometers, and miles.",
+    "category": "unit-converter",
+    "path": "/tools/length-unit-converter",
+    "icon": "Ruler",
+    "tags": ["unit", "converter"]
+  },
+  {
+    "id": "typing-speed-test",
+    "name": "Developer Typing Speed Test",
+    "description": "Test your WPM typing speed and accuracy using code snippets.",
+    "category": "games-edu",
+    "path": "/tools/typing-speed-test",
+    "icon": "Keyboard",
+    "tags": ["checker"],
+    "isNew": true,
+    "gridSpan": "2x1"
+  },
+  {
+    "id": "flashcard-quiz",
+    "name": "Interactive Flashcard Deck",
+    "description": "Practice programming syntax and interview questions with local flashcards.",
+    "category": "games-edu",
+    "path": "/tools/flashcard-quiz",
+    "icon": "BookOpen",
+    "tags": ["viewer"]
+  }
+]
