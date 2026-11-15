@@ -10,7 +10,7 @@
 
 ## Project Status
 
-- **Version:** `v0.3.0`
+- **Version:** `v0.3.1`
 - **Stage:** [Phase 2 Completed & Hardened — Transitioning to Phase 3 Media Utilities](./docs/DISCOVERY_PHASE.md#phase-3-canvas--media-processing-in-progress)
 - **Tools Count:** `8` (Active utilities spanning all 3 standard layout archetypes)
 
