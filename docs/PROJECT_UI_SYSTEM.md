@@ -10,7 +10,7 @@ This document serves as the single source of truth for the project's UI design s
 
 | Layer | Library / Engine | Details |
 | :--- | :--- | :--- |
-| **Framework** | Next.js 16 (App Router + Turbopack) | Server Components, Client Components (`"use client"`) |
+| **Framework** | Next.js 16 (App Router + Turbopack) | Server Components, Client Components (`"use client"`), Static Export (`trailingSlash: true`) |
 | **UI Primitives Engine** | Base UI (`@base-ui/react`) | Component underlying engine (Replaces Radix UI) |
 | **Styling Engine** | Tailwind CSS v4 | Native `@import "tailwindcss";`, OKLCH color support |
 | **Variant Manager** | `class-variance-authority` (cva) | Type-safe variant generation |
@@ -85,27 +85,31 @@ The project uses **Tailwind CSS v4** with **OKLCH color space** variables for hi
 
 ## 3. 🧩 Component & Data Catalog
 
-### Layout Components (`src/components/layouts/*`)
+### Layout & System Helpers
 
 1. **`ToolShell`** (`@/components/layouts/tool-shell`): Outer layout container providing responsive max-width bounds, padding, and ambient background glow.
 2. **`ToolHeader`** (`@/components/layouts/tool-header`): Unified header with breadcrumb navigation, category pastel badges, favorite star toggle (`useFavorites`), and automatic recent tool tracking (`useRecentTools`).
 3. **`SplitPaneLayout`** (`@/components/layouts/split-pane-layout`): Archetype 1 wrapper for data transformation, hash computation, and text processing tools.
 4. **`FocusCanvasLayout`** (`@/components/layouts/focus-canvas-layout`): Archetype 2 wrapper for visual media, canvas editing, and file tools.
 5. **`CompactCardLayout`** (`@/components/layouts/compact-card-layout`): Archetype 3 wrapper for generators, calculators, and color code utilities.
+6. **`createToolMetadata`** (`@/lib/metadata`): Server-side SEO metadata builder pulling tool title, description, tags, and category directly from `@/config/tools` (`TOOLS`) for each tool's `layout.tsx`.
+7. **`NotFound`** (`src/app/not-found.tsx`): Semantic OKLCH 404 stage using `buttonVariants` and ambient glow matching the app shell.
 
 ### Active Tools Live Directory (`src/app/(app)/tools/*`)
 
-1. **`json-formatter/page.tsx`** — JSON Formatter, Syntax Validator & Minifier *(SplitPaneLayout)*
-2. **`base64-encoder/page.tsx`** — UTF-8 Base64 Text & File Encoder/Decoder *(SplitPaneLayout)*
-3. **`hash-generator/page.tsx`** — Web Crypto SHA & MD5 Checksum Generator *(SplitPaneLayout)*
-4. **`case-converter/page.tsx`** — Multi-Format Text Case Converter *(SplitPaneLayout)*
-5. **`word-counter/page.tsx`** — Typographic Word, Character & Readability Analyzer *(SplitPaneLayout)*
-6. **`image-compressor/page.tsx`** — Canvas Image Compressor, Resizer & Converter *(FocusCanvasLayout)*
-7. **`password-generator/page.tsx`** — CSPRNG Cryptographically Secure Password Generator *(CompactCardLayout)*
-8. **`color-converter/page.tsx`** — Universal Color Code Converter (HEX, RGB, HSL, OKLCH, CMYK) *(CompactCardLayout)*
+Each tool route pairs a Server Component **`layout.tsx`** (for static SEO metadata via `createToolMetadata`) with a Client Component **`page.tsx`**:
+
+1. **`json-formatter/{layout,page}.tsx`** — JSON Formatter, Syntax Validator & Minifier *(SplitPaneLayout)*
+2. **`base64-encoder/{layout,page}.tsx`** — UTF-8 Base64 Text & File Encoder/Decoder *(SplitPaneLayout)*
+3. **`hash-generator/{layout,page}.tsx`** — Web Crypto SHA & MD5 Checksum Generator *(SplitPaneLayout)*
+4. **`case-converter/{layout,page}.tsx`** — Multi-Format Text Case Converter *(SplitPaneLayout)*
+5. **`word-counter/{layout,page}.tsx`** — Typographic Word, Character & Readability Analyzer *(SplitPaneLayout)*
+6. **`image-compressor/{layout,page}.tsx`** — Canvas Image Compressor, Resizer & Converter *(FocusCanvasLayout)*
+7. **`password-generator/{layout,page}.tsx`** — CSPRNG Cryptographically Secure Password Generator *(CompactCardLayout)*
+8. **`color-converter/{layout,page}.tsx`** — Universal Color Code Converter (HEX, RGB, HSL, OKLCH, CMYK) *(CompactCardLayout)*
 
 ---
 
 ## 4. 🚨 Critical Architectural Rules
 
-Refer to [UI Best Practices Reference](./UI_BEST_PRACTICES.md) for detailed guidelines on Base UI composition, avoiding `asChild`, React 19 immutability rules, capability detection via `useSyncExternalStore`, and `suppressHydrationWarning` usage.
+Refer to [UI Best Practices Reference](./UI_BEST_PRACTICES.md) for detailed guidelines on Base UI composition, avoiding `asChild`, React 19 immutability rules, capability detection via `useSyncExternalStore`, `suppressHydrationWarning` usage, and per-route static metadata wrappers.
